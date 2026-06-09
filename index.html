@@ -345,6 +345,25 @@
     color: var(--text-muted);
     margin-top: 1px;
   }
+  .btn-copy-main {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin: 16px 0;
+    background: var(--wine);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+  .btn-copy-main:active { background: var(--wine-dark); }
+  .btn-copy-main.copied { background: #4CAF50; }
+
   .btn-copy {
     background: white;
     border: 1.5px solid var(--wine);
@@ -574,37 +593,22 @@
 
     <!-- 見た目 -->
     <div class="tasting-section">
-      <div class="tasting-header">
-        <div>
-          <div class="tasting-label">👁 見た目</div>
-          <div class="tasting-hint">色合い・透明感・輝き・粘性など</div>
-        </div>
-        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
-      </div>
+      <div class="tasting-label">👁 見た目</div>
+      <div class="tasting-hint">色合い・透明感・輝き・粘性など</div>
       <textarea class="tasting-textarea" id="tAppearance" placeholder="例：深いルビー色で、エッジにやや紫がかった色調。透明感があり輝きがある。グラスを傾けると粘性高め。" rows="3"></textarea>
     </div>
 
     <!-- 香り -->
     <div class="tasting-section">
-      <div class="tasting-header">
-        <div>
-          <div class="tasting-label">🌸 香り</div>
-          <div class="tasting-hint">第一香・香りの特徴・強さ・複雑さなど</div>
-        </div>
-        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
-      </div>
+      <div class="tasting-label">🌸 香り</div>
+      <div class="tasting-hint">第一香・香りの特徴・強さ・複雑さなど</div>
       <textarea class="tasting-textarea" id="tAroma" placeholder="例：グラスに注いだ瞬間、熟した黒果実の香り。スミレの花のニュアンスと、スモーキーなオーク香も感じる。" rows="3"></textarea>
     </div>
 
     <!-- 味わい -->
     <div class="tasting-section">
-      <div class="tasting-header">
-        <div>
-          <div class="tasting-label">👄 味わい</div>
-          <div class="tasting-hint">甘み・酸味・タンニン・アルコール・ボディ・余韻など</div>
-        </div>
-        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
-      </div>
+      <div class="tasting-label">👄 味わい</div>
+      <div class="tasting-hint">甘み・酸味・タンニン・アルコール・ボディ・余韻など</div>
       <textarea class="tasting-textarea" id="tPalate" placeholder="例：アタックは力強く、タンニンはなめらか。酸味は中程度で余韻は長い。フルボディでバランスが良い。" rows="3"></textarea>
     </div>
 
@@ -627,10 +631,13 @@
       <button class="btn-heart" id="btnHeart" onclick="toggleHeart()">🤍</button>
     </div>
 
+    <!-- 一括コピー -->
+    <button class="btn-copy-main" onclick="copyAll(this)">📋 コピー（AIに添削してもらう）</button>
+
     <!-- AI添削結果 -->
     <div class="ai-section">
       <div class="section-label">✨ AI添削結果</div>
-      <div class="ai-hint">上のコピーボタンでテキストをコピー → ChatGPTに貼り付け → 結果をここに保存</div>
+      <div class="ai-hint">上の「📋 コピー」ボタンでテキスト一括コピー → ChatGPT/Gemini/Claudeに貼り付け → 結果をここに保存</div>
       <textarea class="tasting-textarea" id="tAI" placeholder="AI添削結果をここに貼り付けて保存できます" rows="4" style="width:100%; background: white;"></textarea>
     </div>
 
