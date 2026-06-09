@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ワインカルテ</title>
+<style>
+  :root {
+    --wine: #8B1A3C;
+    --wine-light: #C2506A;
+    --wine-dark: #5C0E27;
+    --rose-bg: #FAF0F3;
+    --rose-light: #F9E4EB;
+    --card-bg: #FFFFFF;
+    --text: #2D1B1F;
+    --text-muted: #8A6870;
+    --border: #E8D0D7;
+    --gold: #D4A843;
+    --radius: 16px;
+    --shadow: 0 2px 12px rgba(139,26,60,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: var(--rose-bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, var(--wine-dark) 0%, var(--wine) 50%, var(--wine-light) 100%);
+    color: white;
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(92,14,39,0.3);
+  }
+  .app-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .app-header h1 span { font-size: 22px; margin-right: 6px; }
+  .btn-add {
+    background: rgba(255,255,255,0.2);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    color: white;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .btn-add:hover { background: rgba(255,255,255,0.35); }
+  /* ===== SCREEN ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+  /* ===== LIST ===== */
+  .list-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .list-empty .empty-icon { font-size: 64px; margin-bottom: 12px; }
+  .list-empty p { font-size: 15px; line-height: 1.7; }
+  .wine-list { padding: 12px 16px 80px; }
+  .wine-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid var(--border);
+  }
+  .wine-card:active { transform: scale(0.98); box-shadow: 0 1px 6px rgba(139,26,60,0.08); }
+  .card-thumb {
+    width: 60px;
+    height: 75px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--rose-light);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    overflow: hidden;
+    margin-right: 14px;
+  }
+  .card-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+  .card-stars { color: var(--gold); font-size: 14px; letter-spacing: 1px; }
+  .card-type-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: 600;
+  }
+  .type-red    { background: #FDE8ED; color: #8B1A3C; }
+  .type-white  { background: #FFFBE6; color: #7A6A00; }
+  .type-rose   { background: #FFE4EE; color: #C2506A; }
+  .type-sparkling { background: #E8F4FD; color: #1E6FA8; }
+  .type-dessert { background: #FFF0D6; color: #9A5A00; }
+  .card-favorite { font-size: 18px; margin-left: 6px; flex-shrink: 0; }
+  /* ===== DETAIL/EDIT SCREEN ===== */
+  .detail-header {
+    background: linear-gradient(135deg, var(--wine-dark) 0%, var(--wine) 60%, var(--wine-light) 100%);
+    color: white;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(92,14,39,0.3);
+  }
+  .btn-back {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px 4px 0;
+    line-height: 1;
+  }
+  .detail-title {
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+    margin-right: 30px;
+  }
+  .detail-body { padding: 16px 16px 100px; }
+  /* ===== PHOTO SECTION ===== */
+  .photo-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .photo-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--wine);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .photo-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .photo-item {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    position: relative;
+    cursor: pointer;
+  }
+  .photo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  .photo-del {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--wine);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .photo-add-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    border: 2px dashed var(--border);
+    background: var(--rose-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--wine);
+    font-size: 11px;
+    gap: 4px;
+    transition: border-color 0.2s;
+  }
+  .photo-add-btn:hover { border-color: var(--wine); }
+  .photo-add-btn .add-icon { font-size: 22px; }
+  #photoInput { display: none; }
+  .storage-warning {
+    font-size: 11px;
+    color: #E67E22;
+    background: #FFF3E0;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-top: 8px;
+    display: none;
+  }
+  /* ===== METADATA SECTION ===== */
+  .meta-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--wine);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid var(--rose-light);
+    padding-bottom: 8px;
+  }
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rose-light);
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .field-name {
+    font-size: 13px;
+    color: var(--text-muted);
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .field-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .field-input::placeholder { color: var(--border); }
+  /* ===== TYPE TAGS ===== */
+  .type-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .type-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+  .type-tag {
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    background: white;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .type-tag.selected-red    { background: #FDE8ED; color: #8B1A3C; border-color: #8B1A3C; font-weight: 700; }
+  .type-tag.selected-white  { background: #FFFBE6; color: #7A6A00; border-color: #C4A800; font-weight: 700; }
+  .type-tag.selected-rose   { background: #FFE4EE; color: #C2506A; border-color: #C2506A; font-weight: 700; }
+  .type-tag.selected-sparkling { background: #E8F4FD; color: #1E6FA8; border-color: #1E6FA8; font-weight: 700; }
+  .type-tag.selected-dessert { background: #FFF0D6; color: #9A5A00; border-color: #D4A843; font-weight: 700; }
+  /* ===== TASTING SECTIONS ===== */
+  .tasting-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .tasting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rose-light);
+  }
+  .tasting-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--wine);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tasting-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .btn-copy {
+    background: white;
+    border: 1.5px solid var(--wine);
+    color: var(--wine);
+    border-radius: 10px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .btn-copy:hover { background: var(--wine); color: white; }
+  .btn-copy.copied { background: #4CAF50; border-color: #4CAF50; color: white; }
+  .tasting-textarea {
+    width: 100%;
+    border: none;
+    background: var(--rose-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text);
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    line-height: 1.6;
+    min-height: 80px;
+  }
+  .tasting-textarea::placeholder { color: #C8A8B0; font-size: 13px; }
+  /* ===== MEMO ===== */
+  .memo-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  /* ===== RATING ===== */
+  .rating-section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .stars-label { font-size: 13px; font-weight: 700; color: var(--wine); }
+  .stars-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .star {
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--border);
+    line-height: 1;
+    transition: color 0.1s, transform 0.1s;
+    user-select: none;
+  }
+  .star.filled { color: var(--gold); }
+  .star:active { transform: scale(1.25); }
+  .btn-heart {
+    font-size: 28px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0 4px;
+    transition: transform 0.15s;
+    user-select: none;
+    line-height: 1;
+  }
+  .btn-heart:active { transform: scale(1.3); }
+  /* ===== AI添削 ===== */
+  .ai-section {
+    background: linear-gradient(135deg, #FFF8FC, #F9F0FF);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid #E8D0EE;
+  }
+  .ai-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+  /* ===== ACTION BUTTONS ===== */
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .btn-save {
+    flex: 1;
+    background: linear-gradient(135deg, var(--wine-dark), var(--wine));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .btn-save:active { opacity: 0.85; }
+  .btn-delete {
+    background: white;
+    color: var(--wine);
+    border: 1.5px solid var(--wine);
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-delete:hover { background: #FDE8ED; }
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(45,27,31,0.88);
+    color: white;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ===== LIST SCREEN ===== -->
+<div id="screenList" class="screen active">
+  <header class="app-header">
+    <h1><span>🍷</span>ワインカルテ</h1>
+    <button class="btn-add" onclick="openNew()">＋</button>
+  </header>
+  <div id="listContainer"></div>
+</div>
+
+<!-- ===== DETAIL/EDIT SCREEN ===== -->
+<div id="screenDetail" class="screen">
+  <header class="detail-header">
+    <button class="btn-back" onclick="backToList()">‹</button>
+    <div class="detail-title" id="detailTitle">新しいワイン</div>
+  </header>
+  <div class="detail-body">
+
+    <!-- 写真 -->
+    <div class="photo-section">
+      <div class="photo-label">📸 ワインの写真を追加</div>
+      <div class="photo-grid" id="photoGrid">
+        <label class="photo-add-btn" for="photoInput">
+          <span class="add-icon">📷</span>
+          <span>写真追加</span>
+        </label>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this)">
+      <div class="storage-warning" id="storageWarning">⚠️ 写真データが大きくなっています（5MB近く）。古い写真を削除してください。</div>
+    </div>
+
+    <!-- メタデータ -->
+    <div class="meta-section">
+      <div class="section-label">🍾 ワイン情報</div>
+      <div class="field-row">
+        <span class="field-icon">🏷</span>
+        <span class="field-name">ワイン名</span>
+        <input class="field-input" id="fName" type="text" placeholder="入力してください">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">🏠</span>
+        <span class="field-name">生産者</span>
+        <input class="field-input" id="fProducer" type="text" placeholder="入力してください">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">🌍</span>
+        <span class="field-name">生産国/地域</span>
+        <input class="field-input" id="fRegion" type="text" placeholder="入力してください">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">🍇</span>
+        <span class="field-name">品種</span>
+        <input class="field-input" id="fGrape" type="text" placeholder="入力してください">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">📅</span>
+        <span class="field-name">ヴィンテージ</span>
+        <input class="field-input" id="fVintage" type="text" placeholder="例: 2020" inputmode="numeric" maxlength="4">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">🏪</span>
+        <span class="field-name">購入場所</span>
+        <input class="field-input" id="fShop" type="text" placeholder="入力してください">
+      </div>
+      <div class="field-row">
+        <span class="field-icon">🗓</span>
+        <span class="field-name">飲んだ日</span>
+        <input class="field-input" id="fDate" type="date">
+      </div>
+    </div>
+
+    <!-- ワインタイプ -->
+    <div class="type-section">
+      <div class="section-label">🍷 ワインタイプ</div>
+      <div class="type-tags">
+        <button class="type-tag" data-type="red"        onclick="selectType('red')"       >🔴 赤</button>
+        <button class="type-tag" data-type="white"      onclick="selectType('white')"     >🟡 白</button>
+        <button class="type-tag" data-type="rose"       onclick="selectType('rose')"      >🌸 ロゼ</button>
+        <button class="type-tag" data-type="sparkling"  onclick="selectType('sparkling')" >✨ スパークリング</button>
+        <button class="type-tag" data-type="dessert"    onclick="selectType('dessert')"   >🍯 デザート</button>
+      </div>
+    </div>
+
+    <!-- 見た目 -->
+    <div class="tasting-section">
+      <div class="tasting-header">
+        <div>
+          <div class="tasting-label">👁 見た目</div>
+          <div class="tasting-hint">色合い・透明感・輝き・粘性など</div>
+        </div>
+        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
+      </div>
+      <textarea class="tasting-textarea" id="tAppearance" placeholder="例：深いルビー色で、エッジにやや紫がかった色調。透明感があり輝きがある。グラスを傾けると粘性高め。" rows="3"></textarea>
+    </div>
+
+    <!-- 香り -->
+    <div class="tasting-section">
+      <div class="tasting-header">
+        <div>
+          <div class="tasting-label">🌸 香り</div>
+          <div class="tasting-hint">第一香・香りの特徴・強さ・複雑さなど</div>
+        </div>
+        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
+      </div>
+      <textarea class="tasting-textarea" id="tAroma" placeholder="例：グラスに注いだ瞬間、熟した黒果実の香り。スミレの花のニュアンスと、スモーキーなオーク香も感じる。" rows="3"></textarea>
+    </div>
+
+    <!-- 味わい -->
+    <div class="tasting-section">
+      <div class="tasting-header">
+        <div>
+          <div class="tasting-label">👄 味わい</div>
+          <div class="tasting-hint">甘み・酸味・タンニン・アルコール・ボディ・余韻など</div>
+        </div>
+        <button class="btn-copy" onclick="copyAll(this)">📋 コピー</button>
+      </div>
+      <textarea class="tasting-textarea" id="tPalate" placeholder="例：アタックは力強く、タンニンはなめらか。酸味は中程度で余韻は長い。フルボディでバランスが良い。" rows="3"></textarea>
+    </div>
+
+    <!-- その他のメモ -->
+    <div class="memo-section">
+      <div class="section-label">📝 その他のメモ</div>
+      <textarea class="tasting-textarea" id="tMemo" placeholder="テクスチャ・コース・相性など" rows="2" style="width:100%;"></textarea>
+    </div>
+
+    <!-- 総合評価 -->
+    <div class="rating-section">
+      <div class="stars-label">総合評価</div>
+      <div class="stars-row" id="starsRow">
+        <span class="star" data-v="1" onclick="setRating(1)">★</span>
+        <span class="star" data-v="2" onclick="setRating(2)">★</span>
+        <span class="star" data-v="3" onclick="setRating(3)">★</span>
+        <span class="star" data-v="4" onclick="setRating(4)">★</span>
+        <span class="star" data-v="5" onclick="setRating(5)">★</span>
+      </div>
+      <button class="btn-heart" id="btnHeart" onclick="toggleHeart()">🤍</button>
+    </div>
+
+    <!-- AI添削結果 -->
+    <div class="ai-section">
+      <div class="section-label">✨ AI添削結果</div>
+      <div class="ai-hint">上のコピーボタンでテキストをコピー → ChatGPTに貼り付け → 結果をここに保存</div>
+      <textarea class="tasting-textarea" id="tAI" placeholder="AI添削結果をここに貼り付けて保存できます" rows="4" style="width:100%; background: white;"></textarea>
+    </div>
+
+    <!-- アクションボタン -->
+    <div class="action-buttons">
+      <button class="btn-save" onclick="saveEntry()">💾 保存する</button>
+      <button class="btn-delete" id="btnDelete" onclick="deleteEntry()" style="display:none">🗑</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'wine_karte_data';
+const WARN_BYTES = 5 * 1024 * 1024; // 5MB
+
+let currentId = null;
+let currentPhotos = []; // array of base64 strings
+let currentRating = 0;
+let currentHeart = false;
+let currentType = '';
+
+// ===== DATA LAYER =====
+function loadAll() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch { return []; }
+}
+function saveAll(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+function genId() {
+  return 'w_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+}
+
+// ===== LIST =====
+function renderList() {
+  const all = loadAll();
+  const container = document.getElementById('listContainer');
+  if (!all.length) {
+    container.innerHTML = `<div class="list-empty">
+      <div class="empty-icon">🍷</div>
+      <p>まだワインの記録がありません。<br>「＋」ボタンで最初の1本を記録しましょう！</p>
+    </div>`;
+    return;
+  }
+  const sorted = [...all].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const typeMap = { red:'赤', white:'白', rose:'ロゼ', sparkling:'スパークリング', dessert:'デザート' };
+  container.innerHTML = `<div class="wine-list">${sorted.map(w => {
+    const stars = '★'.repeat(w.rating || 0) + '☆'.repeat(5 - (w.rating || 0));
+    const thumb = w.photos && w.photos[0]
+      ? `<div class="card-thumb"><img src="${w.photos[0]}" alt="wine"></div>`
+      : `<div class="card-thumb">🍷</div>`;
+    const typeClass = w.type ? `type-${w.type}` : '';
+    const typeBadge = w.type ? `<span class="card-type-badge ${typeClass}">${typeMap[w.type]||''}</span>` : '';
+    const heart = w.favorite ? '❤️' : '';
+    return `<div class="wine-card" onclick="openEntry('${w.id}')">
+      ${thumb}
+      <div class="card-info">
+        <div class="card-name">${esc(w.name || '（名前なし）')}</div>
+        <div class="card-meta">${esc(w.date || '')}${typeBadge}</div>
+        <div class="card-stars">${stars}</div>
+      </div>
+      <div class="card-favorite">${heart}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== NAVIGATION =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function backToList() {
+  renderList();
+  showScreen('screenList');
+}
+
+function openNew() {
+  currentId = null;
+  currentPhotos = [];
+  currentRating = 0;
+  currentHeart = false;
+  currentType = '';
+  clearForm();
+  document.getElementById('detailTitle').textContent = '新しいワイン';
+  document.getElementById('btnDelete').style.display = 'none';
+  document.getElementById('fDate').value = todayStr();
+  renderPhotos();
+  renderStars();
+  renderHeart();
+  deselectAllTypes();
+  showScreen('screenDetail');
+}
+
+function openEntry(id) {
+  const all = loadAll();
+  const w = all.find(x => x.id === id);
+  if (!w) return;
+  currentId = id;
+  currentPhotos = w.photos ? [...w.photos] : [];
+  currentRating = w.rating || 0;
+  currentHeart = w.favorite || false;
+  currentType = w.type || '';
+  document.getElementById('detailTitle').textContent = w.name || 'ワイン詳細';
+  document.getElementById('btnDelete').style.display = 'inline-block';
+  document.getElementById('fName').value = w.name || '';
+  document.getElementById('fProducer').value = w.producer || '';
+  document.getElementById('fRegion').value = w.region || '';
+  document.getElementById('fGrape').value = w.grape || '';
+  document.getElementById('fVintage').value = w.vintage || '';
+  document.getElementById('fShop').value = w.shop || '';
+  document.getElementById('fDate').value = w.date || '';
+  document.getElementById('tAppearance').value = w.appearance || '';
+  document.getElementById('tAroma').value = w.aroma || '';
+  document.getElementById('tPalate').value = w.palate || '';
+  document.getElementById('tMemo').value = w.memo || '';
+  document.getElementById('tAI').value = w.aiNote || '';
+  renderPhotos();
+  renderStars();
+  renderHeart();
+  deselectAllTypes();
+  if (currentType) selectType(currentType, true);
+  showScreen('screenDetail');
+}
+
+function clearForm() {
+  ['fName','fProducer','fRegion','fGrape','fVintage','fShop'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fDate').value = '';
+  ['tAppearance','tAroma','tPalate','tMemo','tAI'].forEach(id => document.getElementById(id).value = '');
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+// ===== PHOTOS =====
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  let promises = files.map(f => new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(f);
+  }));
+  Promise.all(promises).then(results => {
+    currentPhotos = [...currentPhotos, ...results];
+    renderPhotos();
+    checkStorage();
+    input.value = '';
+  });
+}
+
+function deletePhoto(idx) {
+  currentPhotos.splice(idx, 1);
+  renderPhotos();
+  checkStorage();
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photoGrid');
+  const items = currentPhotos.map((src, i) =>
+    `<div class="photo-item" style="position:relative;display:inline-block;">
+      <img src="${src}" alt="wine photo">
+      <button class="photo-del" onclick="deletePhoto(${i})">×</button>
+    </div>`
+  ).join('');
+  grid.innerHTML = items + `<label class="photo-add-btn" for="photoInput">
+    <span class="add-icon">📷</span><span>写真追加</span>
+  </label>`;
+}
+
+function checkStorage() {
+  const used = JSON.stringify(currentPhotos).length;
+  document.getElementById('storageWarning').style.display = used > WARN_BYTES ? 'block' : 'none';
+}
+
+// ===== TYPE =====
+function selectType(type, silent) {
+  deselectAllTypes();
+  currentType = type;
+  const btn = document.querySelector(`.type-tag[data-type="${type}"]`);
+  if (btn) btn.classList.add(`selected-${type}`);
+}
+
+function deselectAllTypes() {
+  document.querySelectorAll('.type-tag').forEach(b => {
+    b.className = 'type-tag';
+  });
+  currentType = '';
+}
+
+// ===== RATING =====
+function setRating(v) {
+  currentRating = v;
+  renderStars();
+}
+
+function renderStars() {
+  document.querySelectorAll('.star').forEach(s => {
+    s.classList.toggle('filled', parseInt(s.dataset.v) <= currentRating);
+  });
+}
+
+// ===== HEART =====
+function toggleHeart() {
+  currentHeart = !currentHeart;
+  renderHeart();
+}
+
+function renderHeart() {
+  document.getElementById('btnHeart').textContent = currentHeart ? '❤️' : '🤍';
+}
+
+// ===== COPY ALL =====
+function copyAll(btn) {
+  const name = document.getElementById('fName').value.trim();
+  const typeMap = { red:'赤', white:'白', rose:'ロゼ', sparkling:'スパークリング', dessert:'デザート' };
+  const typeLabel = typeMap[currentType] || '';
+  const region = document.getElementById('fRegion').value.trim();
+  const grape = document.getElementById('fGrape').value.trim();
+  const vintage = document.getElementById('fVintage').value.trim();
+  const date = document.getElementById('fDate').value;
+  const dateLabel = date ? date.replace(/-/g, '/') : '';
+  const appearance = document.getElementById('tAppearance').value.trim();
+  const aroma = document.getElementById('tAroma').value.trim();
+  const palate = document.getElementById('tPalate').value.trim();
+
+  const text = [
+    name      ? `ワイン名: ${name}` : '',
+    typeLabel ? `タイプ: ${typeLabel}` : '',
+    region    ? `産地: ${region}` : '',
+    grape     ? `品種: ${grape}` : '',
+    vintage   ? `ヴィンテージ: ${vintage}` : '',
+    dateLabel ? `飲んだ日: ${dateLabel}` : '',
+    '',
+    appearance ? `見た目: ${appearance}` : '見た目: ',
+    '',
+    aroma ? `香り: ${aroma}` : '香り: ',
+    '',
+    palate ? `味わい: ${palate}` : '味わい: ',
+    '',
+    'このテイスティング表現を10点満点で評価し、改善点を教えてください。'
+  ].filter((l, i, arr) => {
+    // 先頭の空行除去
+    if (i === 0 && l === '') return false;
+    return true;
+  }).join('\n');
+
+  const doCopy = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    } else {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Promise.resolve();
+    }
+  };
+
+  doCopy().then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ コピー済み';
+    showToast('クリップボードにコピーしました');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '📋 コピー';
+    }, 2000);
+  }).catch(() => {
+    showToast('コピーに失敗しました');
+  });
+}
+
+// ===== SAVE =====
+function saveEntry() {
+  const name = document.getElementById('fName').value.trim();
+  const all = loadAll();
+  const entry = {
+    id: currentId || genId(),
+    name: name || '（名前なし）',
+    producer: document.getElementById('fProducer').value.trim(),
+    region: document.getElementById('fRegion').value.trim(),
+    grape: document.getElementById('fGrape').value.trim(),
+    vintage: document.getElementById('fVintage').value.trim(),
+    shop: document.getElementById('fShop').value.trim(),
+    date: document.getElementById('fDate').value,
+    type: currentType,
+    appearance: document.getElementById('tAppearance').value,
+    aroma: document.getElementById('tAroma').value,
+    palate: document.getElementById('tPalate').value,
+    memo: document.getElementById('tMemo').value,
+    aiNote: document.getElementById('tAI').value,
+    rating: currentRating,
+    favorite: currentHeart,
+    photos: currentPhotos,
+    updatedAt: Date.now(),
+    createdAt: currentId ? (all.find(x => x.id === currentId)?.createdAt || Date.now()) : Date.now()
+  };
+
+  if (currentId) {
+    const idx = all.findIndex(x => x.id === currentId);
+    if (idx >= 0) all[idx] = entry;
+    else all.push(entry);
+  } else {
+    all.push(entry);
+    currentId = entry.id;
+  }
+
+  try {
+    saveAll(all);
+    document.getElementById('detailTitle').textContent = entry.name;
+    document.getElementById('btnDelete').style.display = 'inline-block';
+    showToast('保存しました 💾');
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      showToast('容量不足です。写真を削除してください。');
+    } else {
+      showToast('保存に失敗しました');
+    }
+  }
+}
+
+// ===== DELETE =====
+function deleteEntry() {
+  if (!currentId) return;
+  if (!confirm('このワイン記録を削除しますか？')) return;
+  const all = loadAll().filter(x => x.id !== currentId);
+  saveAll(all);
+  showToast('削除しました');
+  backToList();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===== INIT =====
+renderList();
+</script>
+</body>
+</html>
