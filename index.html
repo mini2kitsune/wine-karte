@@ -7,109 +7,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme:{ extend:{
+    colors:{
+      bordeaux:{DEFAULT:'#5B0E1A',deep:'#3D070F',soft:'#7A1322'},
+      gold:{DEFAULT:'#D4AF37',soft:'#C49B3A',deep:'#A9842A'},
+      ivory:'#FAF6EF',
+      ink:{DEFAULT:'#4A3F35',soft:'#6B5B4B',mute:'#9A8C7C'},
+      hair:'#E7DECB',
+    },
+    fontFamily:{
+      script:['"Great Vibes"','cursive'],
+      pf:['"Playfair Display"','serif'],
+      jp:['"Noto Serif JP"','serif'],
+    }
+  }}
+}
+</script>
 <style>
-/* ── Utility CSS (Tailwind replacement) ───────────────── */
-*,*::before,*::after{box-sizing:border-box;}
-/* display */
-.flex{display:flex;}.inline-flex{display:inline-flex;}
-/* direction */
-.flex-col{flex-direction:column;}
-/* wrap */
-.flex-wrap{flex-wrap:wrap;}.flex-nowrap{flex-wrap:nowrap;}
-/* align */
-.items-center{align-items:center;}.items-end{align-items:flex-end;}.items-start{align-items:flex-start;}
-.justify-center{justify-content:center;}.justify-start{justify-content:flex-start;}
-.self-center{align-self:center;}.self-end{align-self:flex-end;}.self-stretch{align-self:stretch;}
-.content-end{align-content:flex-end;}
-/* flex sizing */
-.flex-1{flex:1 1 0%;}.shrink-0{flex-shrink:0;}.min-w-0{min-width:0;}
-/* sizing */
-.w-full{width:100%;}.h-full{height:100%;}
-/* position */
-.relative{position:relative;}.absolute{position:absolute;}
-/* text */
-.text-center{text-align:center;}.text-left{text-align:left;}
-.whitespace-nowrap{white-space:nowrap;}
-.italic{font-style:italic;}
-/* font weight */
-.font-bold{font-weight:700;}.font-semibold{font-weight:600;}.font-medium{font-weight:500;}.font-normal{font-weight:400;}
-/* font family */
-.font-jp{font-family:'Noto Serif JP','Yu Mincho',serif;}
-.font-pf{font-family:'Playfair Display',serif;}
-.font-script{font-family:'Great Vibes',cursive;}
-/* overflow */
-.overflow-hidden{overflow:hidden;}
-/* margin */
-.ml-auto{margin-left:auto;}
-/* border */
-.border{border-width:1px;border-style:solid;}
-.border-t{border-top-width:1px;border-top-style:solid;}
-.border-l{border-left-width:1px;border-left-style:solid;}
-.border-dashed{border-style:dashed;}
-.rounded-full{border-radius:9999px;}
-/* colors — text */
-.text-white{color:#fff;}
-.text-ink{color:#4A3F35;}.text-ink-soft{color:#6B5B4B;}.text-ink-mute{color:#9A8C7C;}
-.text-gold{color:#D4AF37;}.text-gold-deep{color:#A9842A;}
-.text-bordeaux-soft{color:#7A1322;}
-/* colors — bg */
-.bg-white{background:#fff;}.bg-ivory{background:#FAF6EF;}
-.bg-bordeaux{background:#5B0E1A;}
-.bg-hair{background:#E7DECB;}
-/* colors — border */
-.border-hair{border-color:#E7DECB;}
-.border-bordeaux{border-color:#5B0E1A;}
-.border-transparent{border-color:transparent;}
-/* arbitrary colors used in file */
-.text-\[\#e8d2a0\]\/90{color:rgba(232,210,160,.9);}
-.text-\[\#E9C766\]{color:#E9C766;}
-.text-\[\#C9A24A\]{color:#C9A24A;}
-.text-\[\#241015\]{color:#241015;}
-.text-\[\#3a1118\]{color:#3a1118;}
-.text-\[\#2c1116\]{color:#2c1116;}
-.text-\[\#D8C9A8\]{color:#D8C9A8;}
-.border-\[\#D8C9A8\]{border-color:#D8C9A8;}
-.bg-white\/15{background:rgba(255,255,255,.15);}
-.bg-white\/60{background:rgba(255,255,255,.6);}
-/* ── Brand CSS ─────────────────────────────────────────── */
-body{margin:0;overflow:hidden;background:#1a0d11;-webkit-font-smoothing:antialiased;}
-.stage{display:flex;align-items:center;justify-content:center;width:100vw;height:100vh;overflow:hidden;padding:28px;box-sizing:border-box;background:radial-gradient(1200px 600px at 50% -10%,#3a1c22 0%,#241115 60%,#1a0d11 100%);}
-.hd{background:radial-gradient(120% 140% at 50% -30%,#6e1320 0%,#5B0E1A 45%,#3D070F 100%);}
-.ai-bg{background:linear-gradient(180deg,#FBF4E6,#F6ECD8);}
-.fav-bg{background:linear-gradient(180deg,#E2BB55,#CFA23C);}
-.fav-notch{clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);}
-.seal-sh{filter:drop-shadow(0 4px 8px rgba(80,20,20,.25));}
-.tt-sh{text-shadow:0 2px 12px rgba(0,0,0,.38);}
-.card{background:#fff;border:1px solid #E7DECB;box-shadow:0 14px 40px rgba(60,30,20,.10),0 3px 10px rgba(60,30,20,.05);}
-/* Bundler thumbnail */
+  body{margin:0;overflow:hidden;background:#1a0d11;}
+  .stage{display:flex;align-items:center;justify-content:center;width:100vw;height:100vh;overflow:hidden;padding:28px;box-sizing:border-box;background:radial-gradient(1200px 600px at 50% -10%,#3a1c22 0%,#241115 60%,#1a0d11 100%);}
+  .hd{background:radial-gradient(120% 140% at 50% -30%,#6e1320 0%,#5B0E1A 45%,#3D070F 100%);}
+  .ai-bg{background:linear-gradient(180deg,#FBF4E6,#F6ECD8);}
+  .fav-bg{background:linear-gradient(180deg,#E2BB55,#CFA23C);}
+  .fav-notch{clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);}
+  .seal-sh{ filter:drop-shadow(0 4px 8px rgba(80,20,20,.25)); }
+  .tt-sh{text-shadow:0 2px 12px rgba(0,0,0,.38);}
+  .card{background:#fff;border:1px solid #E7DECB;box-shadow:0 14px 40px rgba(60,30,20,.10),0 3px 10px rgba(60,30,20,.05);}
 </style>
-<template id="__bundler_thumbnail" data-bg-color="#1a0d11">
-  <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
-    <rect width="400" height="600" fill="#1a0d11"/>
-    <rect x="60" y="30" width="280" height="540" rx="40" fill="#FAF6EF"/>
-    <rect x="60" y="30" width="280" height="90" rx="40" fill="#5B0E1A"/>
-    <rect x="60" y="90" width="280" height="30" fill="#5B0E1A"/>
-    <circle cx="200" cy="56" r="10" fill="#D4AF37" opacity=".8"/>
-    <rect x="120" y="72" width="160" height="14" rx="7" fill="#E9C766" opacity=".85"/>
-    <rect x="80" y="140" width="110" height="130" rx="12" fill="#C49B3A" opacity=".4"/>
-    <rect x="205" y="148" width="120" height="14" rx="4" fill="#241015" opacity=".5"/>
-    <rect x="205" y="170" width="90" height="10" rx="4" fill="#9A8C7C" opacity=".4"/>
-    <rect x="205" y="188" width="100" height="10" rx="4" fill="#9A8C7C" opacity=".35"/>
-    <rect x="205" y="206" width="80" height="10" rx="4" fill="#9A8C7C" opacity=".35"/>
-    <rect x="80" y="292" width="214" height="64" rx="16" fill="white" opacity=".85"/>
-    <text x="92" y="324" font-size="22" fill="#D4AF37">★★★★☆</text>
-    <rect x="304" y="284" width="40" height="76" rx="8" fill="#D4AF37"/>
-    <text x="324" y="326" font-size="20" fill="white" text-anchor="middle">♥</text>
-    <rect x="80" y="370" width="260" height="130" rx="16" fill="white" opacity=".85"/>
-    <circle cx="116" cy="396" r="20" fill="#7A1322" opacity=".75"/>
-    <rect x="148" y="388" width="80" height="12" rx="4" fill="#2c1116" opacity=".5"/>
-    <circle cx="116" cy="438" r="20" fill="#7A1322" opacity=".75"/>
-    <rect x="148" y="430" width="80" height="12" rx="4" fill="#2c1116" opacity=".5"/>
-    <rect x="80" y="514" width="260" height="56" rx="14" fill="#FBF4E6" opacity=".9"/>
-    <rect x="100" y="526" width="120" height="12" rx="4" fill="#2c1116" opacity=".5"/>
-    <rect x="100" y="545" width="160" height="10" rx="4" fill="#9A8C7C" opacity=".4"/>
-  </svg>
-</template>
 </head>
 <body class="font-jp">
 <div class="stage">
@@ -382,375 +309,535 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 window.addEventListener('resize',fitPhone);
 </script>
+
+<style id="v3-mobile-override">
+  body { background: #FAF6EF !important; overflow: auto !important; }
+  .stage {
+    padding: 0 !important;
+    background: none !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+  .stage > div > div:first-child {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+</style>
+
 <script>
-/* ── Wine Karte v2 — App ── */
-(function(){
+(function() {
 'use strict';
-var STORAGE_KEY='wine_karte_v2_data';
-var STORAGE_WARN=5*1024*1024;
 
-function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return[];}}
-function saveData(data){
-  var s=JSON.stringify(data);
-  localStorage.setItem(STORAGE_KEY,s);
-  try{var tot=0;for(var k in localStorage){if(localStorage.hasOwnProperty(k))tot+=(localStorage[k].length+k.length)*2;}if(tot>STORAGE_WARN)showToast('⚠️ ストレージ残量が5MBを超えています');}catch(e){}
-}
-function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
-function esc(s){if(!s&&s!==0)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// ── Data Management ──────────────────────────────────────────────────────────
+const STORAGE_KEY = 'wine_karte_v3_data';
 
-function showToast(msg){
-  var el=document.createElement('div');
-  el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,12,10,.92);color:#E9C766;padding:14px 28px;border-radius:32px;font-size:22px;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:none;';
-  el.textContent=msg;document.body.appendChild(el);setTimeout(function(){el.remove();},3000);
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch(e) { return []; }
 }
 
-var _screen='list',_currentId=null,_origHTML=null;
-function sc(){return document.getElementById('scaler');}
-function reFit(){if(typeof window.fitPhone==='function'){window._nh=0;window.fitPhone();}}
-
-/* ── Stars ── */
-function starHTML(rating){
-  var r=parseFloat(rating)||0;
-  var p='<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z"/>';
-  var h='';
-  for(var i=0;i<5;i++){
-    var f=r-i;
-    if(f>=1)h+='<svg viewBox="0 0 24 24" style="width:46px;height:46px;" fill="#D4AF37">'+p+'</svg>';
-    else if(f>=0.5)h+='<svg viewBox="0 0 24 24" style="width:46px;height:46px;"><defs><linearGradient id="hg'+i+'"><stop offset="50%" stop-color="#D4AF37"/><stop offset="50%" stop-color="#E2D7BE"/></linearGradient></defs><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z" fill="url(#hg'+i+')"/></svg>';
-    else h+='<svg viewBox="0 0 24 24" style="width:46px;height:46px;" fill="#E2D7BE">'+p+'</svg>';
+function saveData(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  catch(e) {
+    if (e.name === 'QuotaExceededError') showToast('容量不足です。写真を削除してください。');
   }
-  return h;
 }
 
-/* ── Phone frame ── */
-var PHONE_OPEN='<div class="w-full bg-ivory" style="border-radius:72px;overflow:hidden;box-shadow:0 60px 140px rgba(0,0,0,.55),0 0 0 16px #0e0709,0 0 0 20px #2a1a1d;">';
-var PHONE_CLOSE='</div>';
-var HEADER_HTML='<header class="hd relative text-center" style="padding:24px 20px 20px;"><div class="flex flex-col items-center" style="gap:2px;"><img src="assets/grape_gold.png" alt="" style="width:48px;margin-bottom:-4px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));"><div class="tt-sh font-script text-[#E9C766] flex items-center whitespace-nowrap" style="font-size:68px;line-height:1;gap:18px;"><span class="font-pf italic text-[#C9A24A]" style="font-size:46px;">~</span>Wine Notes<span class="font-pf italic text-[#C9A24A]" style="font-size:46px;">~</span></div></div>';
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,10,10,.88);color:#FAF6EF;padding:14px 24px;border-radius:40px;font-size:22px;z-index:9999;pointer-events:none;';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
 
-/* ── LIST VIEW ── */
-function buildListHTML(entries){
-  var items='';
-  for(var i=0;i<entries.length;i++){
-    var e=entries[i];
-    items+='<div class="wk-item" data-id="'+esc(e.id)+'" data-idx="'+i+'" style="display:flex;align-items:center;gap:20px;padding:20px 24px;border-bottom:1px solid #E7DECB;cursor:pointer;background:#fff;">'+
-      '<div style="width:100px;height:100px;border-radius:14px;overflow:hidden;flex-shrink:0;background:#FAF6EF;">'+
-      '<img src="'+(e.photo?esc(e.photo):'assets/wine_photo.png')+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.src=\'assets/wine_photo.png\'" alt=""></div>'+
-      '<div style="flex:1;min-width:0;">'+
-      '<div style="font-size:30px;font-weight:600;color:#241015;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(e.name||'(名称未設定)')+'</div>'+
-      '<div style="font-size:22px;color:#6B5B4B;margin-top:6px;">'+esc(e.vintage?e.vintage+'年':'')+' '+esc(e.type||'')+'</div>'+
-      '<div style="font-size:20px;color:#9A8C7C;margin-top:4px;">'+esc(e.drinkDate||'')+'</div>'+
-      '<div style="display:flex;margin-top:8px;">'+starHTML(e.rating||0)+'</div></div>'+
-      '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">'+
-      '<span style="font-size:36px;color:'+(e.favorite?'#D4AF37':'#E7DECB')+';">♥</span>'+
-      '<svg viewBox="0 0 24 24" style="width:28px;height:28px;" fill="none" stroke="#C0B090" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>';
+// ── State ────────────────────────────────────────────────────────────────────
+let currentRating = 4.5;
+let currentId = null;
+const NEW_ENTRY_ID = '__new__';
+
+// ── Stars ────────────────────────────────────────────────────────────────────
+const STAR_PATH = '<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z"/>';
+const STAR_SZ = 'style="width:46px;height:46px;"';
+
+function renderStars(rating) {
+  currentRating = rating;
+  const starsDiv = document.getElementById('stars');
+  if (!starsDiv) return;
+  starsDiv.dataset.rating = rating;
+  let html = '';
+  for (let i = 0; i < 5; i++) {
+    const fill = Math.min(1, Math.max(0, rating - i));
+    if (fill >= 1) {
+      html += `<svg viewBox="0 0 24 24" ${STAR_SZ} fill="#D4AF37">${STAR_PATH}</svg>`;
+    } else if (fill >= 0.5) {
+      html += `<svg viewBox="0 0 24 24" ${STAR_SZ}><defs><linearGradient id="hg${i}"><stop offset="50%" stop-color="#D4AF37"/><stop offset="50%" stop-color="#E2D7BE"/></linearGradient></defs><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z" fill="url(#hg${i})"/></svg>`;
+    } else {
+      html += `<svg viewBox="0 0 24 24" ${STAR_SZ} fill="#E2D7BE">${STAR_PATH}</svg>`;
+    }
   }
-  var empty=entries.length===0?'<div style="padding:80px 40px;text-align:center;color:#9A8C7C;"><div style="font-size:80px;margin-bottom:24px;">🍷</div><div style="font-size:26px;line-height:1.7;">まだワインの記録がありません<br>＋ボタンで最初の一本を記録しましょう</div></div>':'';
-  return PHONE_OPEN+HEADER_HTML+
-    '<button id="wk-add" style="position:absolute;right:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;display:flex;align-items:center;justify-content:center;color:#E9C766;font-size:44px;background:none;border:none;cursor:pointer;">＋</button></header>'+
-    '<div style="height:1400px;overflow-y:auto;background:#FAF6EF;">'+empty+items+'</div>'+PHONE_CLOSE;
+  starsDiv.innerHTML = html;
+  const ratingEl = document.getElementById('v3-rating-num');
+  if (ratingEl) {
+    const tn = ratingEl.firstChild;
+    if (tn && tn.nodeType === 3) tn.textContent = rating.toFixed(1) + ' ';
+  }
 }
 
-function showList(){
-  _screen='list';_currentId=null;
-  sc().innerHTML=buildListHTML(loadData());
-  reFit();
-  document.getElementById('wk-add').addEventListener('click',function(){showEdit(null);});
-  var items=sc().querySelectorAll('.wk-item');
-  for(var i=0;i<items.length;i++){
-    items[i].addEventListener('click',function(){
-      var data=loadData();
-      var idx=parseInt(this.dataset.idx);
-      var entry=null;
-      for(var j=0;j<data.length;j++){if(data[j].id===this.dataset.id){entry=data[j];break;}}
-      if(entry)showDetail(entry,idx,data);
+// ── DOM ID Assignment ─────────────────────────────────────────────────────────
+function initDOMTargets() {
+  const h1 = document.querySelector('header ~ div .card h1');
+  if (h1) h1.id = 'v3-wine-title';
+
+  const chips = document.querySelectorAll('header ~ div .card .flex.flex-wrap span');
+  if (chips[0]) chips[0].id = 'v3-chip-type';
+  if (chips[1]) chips[1].id = 'v3-chip-country';
+  if (chips[2]) chips[2].id = 'v3-chip-grape';
+
+  const dds = document.querySelectorAll('header ~ div .card dl dd');
+  const ddIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop'];
+  dds.forEach((dd, i) => { if (ddIds[i]) dd.id = ddIds[i]; });
+
+  const tastingTexts = document.querySelectorAll('.card .text-ink[style*="font-size:24px"]');
+  const tastingIds = ['v3-taste-look','v3-taste-aroma','v3-taste-flavor','v3-taste-memo'];
+  tastingTexts.forEach((el, i) => { if (tastingIds[i]) el.id = tastingIds[i]; });
+
+  // rating number: find .font-pf with class text-[#3a1118]
+  const ratingNum = [...document.querySelectorAll('.font-pf')].find(el => el.classList.contains('text-[#3a1118]'));
+  if (ratingNum) ratingNum.id = 'v3-rating-num';
+
+  const aiP = document.querySelector('.ai-bg p');
+  if (aiP) aiP.id = 'v3-ai-comment';
+
+  const photoImg = document.querySelector('.card .relative img');
+  if (photoImg) photoImg.id = 'v3-photo';
+
+  const headerBtns = document.querySelectorAll('header button');
+  if (headerBtns[1]) headerBtns[1].id = 'v3-save-btn';
+
+  const navBtns = document.querySelectorAll('nav button');
+  if (navBtns[0]) navBtns[0].id = 'v3-nav-prev';
+  if (navBtns[1]) navBtns[1].id = 'v3-nav-list';
+  if (navBtns[2]) navBtns[2].id = 'v3-nav-next';
+}
+
+// ── Inline Edit ───────────────────────────────────────────────────────────────
+function enableInlineEdit() {
+  const ids = ['v3-wine-title','v3-meta-producer','v3-meta-vintage',
+    'v3-meta-price','v3-meta-shop','v3-taste-look','v3-taste-aroma',
+    'v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('contenteditable','true');
+    el.style.outline = 'none';
+    el.style.cursor = 'text';
+    el.style.minHeight = '1em';
+    el.addEventListener('focus', () => { el.style.boxShadow = '0 0 0 2px #D4AF37'; el.style.borderRadius = '6px'; });
+    el.addEventListener('blur',  () => { el.style.boxShadow = ''; el.style.borderRadius = ''; });
+  });
+}
+
+// ── Date Picker ───────────────────────────────────────────────────────────────
+function enableDatePicker() {
+  const dateDd = document.getElementById('v3-meta-date');
+  if (!dateDd) return;
+  // Remove contenteditable on date field (use date picker instead)
+  dateDd.removeAttribute('contenteditable');
+  dateDd.style.cursor = 'pointer';
+  const inp = document.createElement('input');
+  inp.type = 'date';
+  inp.style.cssText = 'position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;cursor:pointer;';
+  dateDd.style.position = 'relative';
+  dateDd.appendChild(inp);
+  inp.addEventListener('change', () => {
+    if (!inp.value) return;
+    const d = new Date(inp.value);
+    const days = ['日','月','火','水','木','金','土'];
+    const fmt = `${d.getFullYear()} / ${String(d.getMonth()+1).padStart(2,'0')} / ${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
+    const tn = dateDd.firstChild;
+    if (tn && tn.nodeType === 3) {
+      tn.textContent = fmt;
+    } else {
+      dateDd.insertBefore(document.createTextNode(fmt), dateDd.firstChild);
+    }
+  });
+}
+
+// ── Photo Upload ──────────────────────────────────────────────────────────────
+function enablePhotoUpload() {
+  const photoBtn = document.querySelector('.card .relative button');
+  const photoImg = document.getElementById('v3-photo');
+  if (!photoBtn || !photoImg) return;
+  const fileInp = document.createElement('input');
+  fileInp.type = 'file';
+  fileInp.accept = 'image/*';
+  fileInp.capture = 'environment';
+  fileInp.style.display = 'none';
+  document.body.appendChild(fileInp);
+  photoBtn.addEventListener('click', () => fileInp.click());
+  fileInp.addEventListener('change', () => {
+    const file = fileInp.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => { photoImg.src = e.target.result; };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Star Rating ───────────────────────────────────────────────────────────────
+function enableStarRating() {
+  const starsDiv = document.getElementById('stars');
+  if (!starsDiv) return;
+  starsDiv.style.cursor = 'pointer';
+  starsDiv.addEventListener('click', e => {
+    const rect = starsDiv.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const starW = rect.width / 5;
+    const idx = Math.floor(x / starW);
+    const half = (x % starW) < starW / 2;
+    renderStars(half ? idx + 0.5 : idx + 1);
+  });
+  renderStars(currentRating);
+}
+
+// ── Fav Toggle ────────────────────────────────────────────────────────────────
+function enableFavToggle() {
+  const favBtn = document.getElementById('favTab');
+  if (!favBtn) return;
+  // Sync visual with current data-fav state
+  const h = favBtn.querySelector('span');
+  if (h) h.textContent = favBtn.dataset.fav === '1' ? '♥' : '♡';
+  favBtn.addEventListener('click', () => {
+    const isFav = favBtn.dataset.fav !== '1';
+    favBtn.dataset.fav = isFav ? '1' : '0';
+    const hh = favBtn.querySelector('span');
+    if (hh) hh.textContent = isFav ? '♥' : '♡';
+  });
+}
+
+// ── Likert ────────────────────────────────────────────────────────────────────
+function setupLikert() {
+  document.querySelectorAll('#likert .opt').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#likert .opt').forEach(x => {
+        x.classList.remove('bg-bordeaux','border-bordeaux','text-white');
+        x.classList.add('bg-white','border-hair','text-ink-soft');
+      });
+      b.classList.remove('bg-white','border-hair','text-ink-soft');
+      b.classList.add('bg-bordeaux','border-bordeaux','text-white');
     });
+  });
+}
+
+// ── Collect Entry ─────────────────────────────────────────────────────────────
+function collectCurrentEntry() {
+  function getText(id) {
+    const el = document.getElementById(id);
+    return el ? el.innerText.trim() : '';
+  }
+
+  const h1El = document.getElementById('v3-wine-title');
+  let wineName = '', vintage = '';
+  if (h1El) {
+    const spanEl = h1El.querySelector('span');
+    vintage = spanEl ? spanEl.innerText.trim() : '';
+    wineName = h1El.innerText.replace(vintage, '').trim();
+  }
+
+  const starsDiv = document.getElementById('stars');
+  const rating = starsDiv ? parseFloat(starsDiv.dataset.rating || '4.5') : 4.5;
+
+  const activeLikert = document.querySelector('#likert .bg-bordeaux');
+  const wantAgain = activeLikert ? activeLikert.innerText.trim() : 'はい';
+
+  const favBtn = document.getElementById('favTab');
+  const isFav = favBtn ? (favBtn.dataset.fav === '1') : false;
+
+  const photoImg = document.getElementById('v3-photo');
+  const srcAttr = photoImg ? (photoImg.getAttribute('src') || '') : '';
+  const photoSrc = (photoImg && photoImg.src && !srcAttr.includes('wine_photo.png'))
+    ? photoImg.src : '';
+
+  return {
+    id: (currentId && currentId !== NEW_ENTRY_ID) ? currentId : null,
+    createdAt: Date.now(),
+    wineName,
+    vintage,
+    producer:    getText('v3-meta-producer'),
+    country:     document.getElementById('v3-chip-country') ? document.getElementById('v3-chip-country').innerText.trim() : '',
+    grape:       document.getElementById('v3-chip-grape')   ? document.getElementById('v3-chip-grape').innerText.trim()   : '',
+    wineType:    document.getElementById('v3-chip-type')    ? document.getElementById('v3-chip-type').innerText.trim()    : '',
+    drinkDate:   getText('v3-meta-date'),
+    price:       getText('v3-meta-price'),
+    shop:        getText('v3-meta-shop'),
+    tasteLook:   getText('v3-taste-look'),
+    tasteAroma:  getText('v3-taste-aroma'),
+    tasteFlavor: getText('v3-taste-flavor'),
+    tasteMemo:   getText('v3-taste-memo'),
+    rating,
+    wantAgain,
+    isFav,
+    photo: photoSrc,
+    aiComment: getText('v3-ai-comment'),
+  };
+}
+
+// ── Fill Entry ────────────────────────────────────────────────────────────────
+function fillEntry(entry) {
+  const h1El = document.getElementById('v3-wine-title');
+  if (h1El) {
+    const spanEl = h1El.querySelector('span');
+    if (spanEl) {
+      const tn = h1El.firstChild;
+      if (tn && tn.nodeType === 3) tn.textContent = (entry.wineName || '') + ' ';
+      spanEl.textContent = entry.vintage || '';
+    }
+  }
+
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val || '';
+  }
+  setText('v3-meta-producer', entry.producer);
+  setText('v3-meta-vintage',  entry.vintage);
+  setText('v3-meta-date',     entry.drinkDate);
+  setText('v3-meta-price',    entry.price);
+  setText('v3-meta-shop',     entry.shop);
+  setText('v3-taste-look',    entry.tasteLook);
+  setText('v3-taste-aroma',   entry.tasteAroma);
+  setText('v3-taste-flavor',  entry.tasteFlavor);
+  setText('v3-taste-memo',    entry.tasteMemo);
+  setText('v3-ai-comment',    entry.aiComment);
+
+  if (entry.photo) {
+    const photoImg = document.getElementById('v3-photo');
+    if (photoImg) photoImg.src = entry.photo;
+  }
+
+  renderStars(entry.rating || 4.5);
+
+  document.querySelectorAll('#likert .opt').forEach(btn => {
+    const isActive = btn.innerText.trim() === (entry.wantAgain || 'はい');
+    btn.classList.toggle('bg-bordeaux', isActive);
+    btn.classList.toggle('border-bordeaux', isActive);
+    btn.classList.toggle('text-white', isActive);
+    btn.classList.toggle('bg-white', !isActive);
+    btn.classList.toggle('border-hair', !isActive);
+    btn.classList.toggle('text-ink-soft', !isActive);
+  });
+
+  const favBtn = document.getElementById('favTab');
+  if (favBtn) {
+    favBtn.dataset.fav = entry.isFav ? '1' : '0';
+    const h = favBtn.querySelector('span');
+    if (h) h.textContent = entry.isFav ? '♥' : '♡';
   }
 }
 
-/* ── DETAIL VIEW ── */
-function showDetail(entry,idx,allEntries){
-  _screen='detail';_currentId=entry.id;
-  sc().innerHTML=_origHTML;
-  fillDetail(entry);
-  wireDetail(entry,idx,allEntries||loadData());
-  reFit();
-}
-
-function fillDetail(e){
-  var infoCard=sc().querySelector('.card.flex');
-  // Photo
-  var photoImg=sc().querySelector('.relative.shrink-0 img');
-  if(photoImg&&e.photo)photoImg.src=e.photo;
-  // h1
-  var h1=infoCard?infoCard.querySelector('h1'):null;
-  if(h1)h1.innerHTML=esc(e.name||'')+'<span style="font-size:32px;font-weight:500;"> '+esc(e.vintage||'')+'</span>';
-  // Chips: type chip text, region chip, varieties chip
-  var chipsWrap=infoCard?infoCard.querySelector('.flex.flex-wrap'):null;
-  if(chipsWrap){
-    var chips=chipsWrap.querySelectorAll(':scope > span');
-    if(chips[0]){
-      // type chip: SVG + text node
-      var svgEl=chips[0].querySelector('svg');
-      if(svgEl){var tn=svgEl.nextSibling;while(tn&&tn.nodeType===3){var nx=tn.nextSibling;chips[0].removeChild(tn);tn=nx;}chips[0].appendChild(document.createTextNode(e.type||'赤ワイン'));}
+// ── Save Button ───────────────────────────────────────────────────────────────
+function enableSaveButton() {
+  const saveBtn = document.getElementById('v3-save-btn');
+  if (!saveBtn) return;
+  saveBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:40px;height:40px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
+  saveBtn.addEventListener('click', () => {
+    const entry = collectCurrentEntry();
+    if (!entry.wineName && !entry.tasteLook) {
+      showToast('まず内容を入力してください');
+      return;
     }
-    if(chips[1]){
-      // region chip: inner span (flag) + text
-      var flagSpan=chips[1].querySelector('span');
-      if(flagSpan){var tn=flagSpan.nextSibling;while(tn){var nx=tn.nextSibling;chips[1].removeChild(tn);tn=nx;}chips[1].appendChild(document.createTextNode(e.region||''));}
-    }
-    if(chips[2]){
-      var svgEl2=chips[2].querySelector('svg');
-      if(svgEl2){var tn=svgEl2.nextSibling;while(tn&&tn.nodeType===3){var nx=tn.nextSibling;chips[2].removeChild(tn);tn=nx;}chips[2].appendChild(document.createTextNode(e.varieties||''));}
-    }
-  }
-  // Meta dl
-  var dlItems=infoCard?infoCard.querySelectorAll('dl .flex'):[];
-  var vals=[e.producer,e.vintage,e.drinkDate,e.price,e.shop];
-  for(var i=0;i<dlItems.length;i++){var dd=dlItems[i].querySelector('dd');if(dd)dd.textContent=vals[i]||'';}
-  // Stars
-  var starsEl=document.getElementById('stars');
-  if(starsEl)starsEl.innerHTML=starHTML(e.rating||0);
-  // Rating number
-  var ratingNum=starsEl?starsEl.nextElementSibling:null;
-  if(ratingNum)ratingNum.innerHTML=(parseFloat(e.rating||0).toFixed(1))+' <span class="text-ink-mute font-normal" style="font-size:22px;">/ 5.0</span>';
-  // Likert
-  var likert=document.getElementById('likert');
-  if(likert){
-    var opts=likert.querySelectorAll('.opt');
-    var againVals=['yes','maybe','no'];
-    for(var i=0;i<opts.length;i++){
-      var on=(e.again||'yes')===againVals[i];
-      opts[i].classList.toggle('bg-bordeaux',on);opts[i].classList.toggle('border-bordeaux',on);opts[i].classList.toggle('text-white',on);
-      opts[i].classList.toggle('bg-white',!on);opts[i].classList.toggle('border-hair',!on);opts[i].classList.toggle('text-ink-soft',!on);
-    }
-  }
-  // Favorite
-  var fav=document.getElementById('favTab');
-  if(fav)fav.style.background=e.favorite?'linear-gradient(180deg,#E2BB55,#CFA23C)':'linear-gradient(180deg,#B0A0A0,#907070)';
-  // Tasting rows
-  var sealImg=sc().querySelector('img[src="assets/seal_look.png"]');
-  if(sealImg){
-    var tCard=sealImg.closest('.card');
-    var tRows=tCard?tCard.querySelectorAll(':scope > .flex'):[];
-    var tFields=['look','aroma','taste','memo'];
-    for(var i=0;i<tRows.length;i++){var td=tRows[i].querySelector('.flex-1.min-w-0 .text-ink');if(td)td.textContent=e[tFields[i]]||'';}
-  }
-}
-
-function wireDetail(entry,idx,allEntries){
-  // Likert
-  var likert=document.getElementById('likert');
-  if(likert){
-    var opts=likert.querySelectorAll('.opt');
-    var againVals=['yes','maybe','no'];
-    (function(opts,againVals){
-      for(var i=0;i<opts.length;i++){
-        (function(btn,val){
-          btn.addEventListener('click',function(){
-            var data=loadData();
-            for(var j=0;j<data.length;j++){if(data[j].id===entry.id){data[j].again=val;entry.again=val;break;}}
-            saveData(data);
-            for(var k=0;k<opts.length;k++){
-              var on=againVals[k]===val;
-              opts[k].classList.toggle('bg-bordeaux',on);opts[k].classList.toggle('border-bordeaux',on);opts[k].classList.toggle('text-white',on);
-              opts[k].classList.toggle('bg-white',!on);opts[k].classList.toggle('border-hair',!on);opts[k].classList.toggle('text-ink-soft',!on);
-            }
-          });
-        })(opts[i],againVals[i]);
+    const arr = loadData();
+    if (currentId && currentId !== NEW_ENTRY_ID) {
+      const idx = arr.findIndex(e => e.id === currentId);
+      if (idx >= 0) {
+        arr[idx] = { ...arr[idx], ...entry, id: currentId };
+      } else {
+        entry.id = currentId;
+        arr.unshift(entry);
       }
-    })(opts,againVals);
-  }
-  // Favorite
-  var fav=document.getElementById('favTab');
-  if(fav){fav.addEventListener('click',function(){
-    var data=loadData();
-    for(var i=0;i<data.length;i++){if(data[i].id===entry.id){data[i].favorite=!data[i].favorite;entry.favorite=data[i].favorite;break;}}
-    saveData(data);
-    fav.style.background=entry.favorite?'linear-gradient(180deg,#E2BB55,#CFA23C)':'linear-gradient(180deg,#B0A0A0,#907070)';
-  });}
-  // Header buttons
-  var header=sc().querySelector('header');
-  if(header){
-    var btns=header.querySelectorAll('button');
-    if(btns[0])btns[0].addEventListener('click',showList);
-    if(btns[1])btns[1].addEventListener('click',function(){showContextMenu(entry,idx,allEntries);});
-  }
-  // Photo upload
-  var camBtn=sc().querySelector('.relative.shrink-0 button');
-  if(camBtn){camBtn.addEventListener('click',function(){
-    var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-    inp.addEventListener('change',function(){
-      var file=this.files[0];if(!file)return;
-      var reader=new FileReader();
-      reader.onload=function(ev){
-        var data=loadData();
-        for(var i=0;i<data.length;i++){if(data[i].id===entry.id){data[i].photo=ev.target.result;entry.photo=ev.target.result;break;}}
-        saveData(data);
-        var img=sc().querySelector('.relative.shrink-0 img');if(img)img.src=ev.target.result;
-      };reader.readAsDataURL(file);
-    });inp.click();
-  });}
-  // Copy button
-  var grid=sc().querySelector('[style*="grid-template-columns"]');
-  if(grid){var actBtns=grid.querySelectorAll('button');if(actBtns[0])actBtns[0].addEventListener('click',function(){copyTasting(entry);});}
-  // Tasting pencil buttons → edit
-  var sealImg=sc().querySelector('img[src="assets/seal_look.png"]');
-  if(sealImg){
-    var tCard=sealImg.closest('.card');
-    var tRows=tCard?tCard.querySelectorAll(':scope > .flex'):[];
-    for(var i=0;i<tRows.length;i++){
-      var eb=tRows[i].querySelector('button');
-      if(eb)(function(btn){btn.addEventListener('click',function(){showEdit(entry);});})(eb);
+    } else {
+      entry.id = Date.now().toString();
+      entry.createdAt = Date.now();
+      currentId = entry.id;
+      arr.unshift(entry);
     }
-  }
-  // Footer nav
-  var footer=sc().querySelector('nav');
-  if(footer){
-    var navBtns=footer.querySelectorAll('button');
-    if(navBtns[0])navBtns[0].addEventListener('click',function(){var data=loadData();if(idx>0)showDetail(data[idx-1],idx-1,data);});
-    if(navBtns[1])navBtns[1].addEventListener('click',showList);
-    if(navBtns[2])navBtns[2].addEventListener('click',function(){var data=loadData();if(idx<data.length-1)showDetail(data[idx+1],idx+1,data);});
-  }
-}
-
-/* ── COPY TASTING ── */
-function copyTasting(e){
-  var text=[
-    'ワイン名: '+(e.name||''),'タイプ: '+(e.type||''),'産地: '+(e.region||''),
-    '品種: '+(e.varieties||''),'ヴィンテージ: '+(e.vintage||''),'飲んだ日: '+(e.drinkDate||''),
-    '','見た目: '+(e.look||''),'香り: '+(e.aroma||''),'味わい: '+(e.taste||''),'ひとこと: '+(e.memo||''),
-    '','このテイスティング表現を10点満点で評価し、改善点を教えてください。'
-  ].join('\n');
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(function(){showToast('コピーしました ✓');}).catch(function(){fallbackCopy(text);});
-  }else{fallbackCopy(text);}
-}
-function fallbackCopy(text){
-  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0;';
-  document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('コピーしました ✓');
-}
-
-/* ── CONTEXT MENU ── */
-function showContextMenu(entry,idx,allEntries){
-  var ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;display:flex;align-items:flex-end;justify-content:center;';
-  ov.innerHTML='<div style="background:#FAF6EF;border-radius:32px 32px 0 0;padding:32px 24px;width:100%;max-width:640px;">'+
-    '<button id="wk-ctx-edit" style="display:block;width:100%;padding:22px;font-size:28px;color:#241015;background:#fff;border:1px solid #E7DECB;border-radius:20px;margin-bottom:14px;cursor:pointer;">✏️ 編集する</button>'+
-    '<button id="wk-ctx-del" style="display:block;width:100%;padding:22px;font-size:28px;color:#7A1322;background:#fff;border:1px solid #E7DECB;border-radius:20px;margin-bottom:14px;cursor:pointer;">🗑️ 削除する</button>'+
-    '<button id="wk-ctx-cancel" style="display:block;width:100%;padding:22px;font-size:28px;color:#9A8C7C;background:none;border:none;cursor:pointer;">キャンセル</button></div>';
-  document.body.appendChild(ov);
-  document.getElementById('wk-ctx-edit').addEventListener('click',function(){ov.remove();showEdit(entry);});
-  document.getElementById('wk-ctx-del').addEventListener('click',function(){
-    ov.remove();
-    if(confirm('このワイン記録を削除しますか？')){
-      var data=loadData().filter(function(e){return e.id!==entry.id;});
-      saveData(data);showList();
-    }
+    saveData(arr);
+    showToast('✓ 保存しました');
   });
-  document.getElementById('wk-ctx-cancel').addEventListener('click',function(){ov.remove();});
-  ov.addEventListener('click',function(ev){if(ev.target===ov)ov.remove();});
 }
 
-/* ── EDIT VIEW ── */
-var WINE_TYPES=['赤ワイン','白ワイン','ロゼ','スパークリング','甘口'];
-var IS='width:100%;padding:16px 18px;font-size:26px;border:1px solid #E7DECB;border-radius:16px;background:#fff;color:#241015;font-family:inherit;box-sizing:border-box;';
-var LS='display:block;font-size:22px;color:#6B5B4B;margin-bottom:8px;';
-var FS='margin-bottom:24px;';
+// ── Action Buttons ────────────────────────────────────────────────────────────
+function enableActionButtons() {
+  const actionBtns = document.querySelectorAll('div[style*="grid-template-columns"] button');
 
-function buildEditHTML(e){
-  var isNew=!e;
-  var entry=e||{id:genId(),name:'',vintage:'',type:'赤ワイン',region:'',producer:'',varieties:'',drinkDate:'',price:'',shop:'',rating:0,again:'yes',favorite:false,look:'',aroma:'',taste:'',memo:'',photo:''};
-  var typeOpts=WINE_TYPES.map(function(t){return'<option value="'+esc(t)+'"'+(entry.type===t?' selected':'')+'>'+esc(t)+'</option>';}).join('');
-  var ratingOpts='';for(var i=0;i<=10;i++){var v=(i*0.5).toFixed(1);ratingOpts+='<option value="'+v+'"'+((parseFloat(entry.rating||0).toFixed(1))===v?' selected':'')+'>'+v+'</option>';}
-  return PHONE_OPEN+HEADER_HTML+
-    '<button id="wk-edit-cancel" style="position:absolute;left:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;color:#e8d2a0;font-size:30px;background:none;border:none;cursor:pointer;">✕</button>'+
-    '<div style="color:#E9C766;font-size:34px;font-weight:600;">'+(isNew?'新しいワイン':'ワインを編集')+'</div>'+
-    '<button id="wk-edit-save" style="position:absolute;right:24px;top:50%;transform:translateY(-50%);padding:10px 22px;color:#241015;background:#E9C766;border:none;border-radius:30px;font-size:24px;font-weight:600;cursor:pointer;">保存</button></header>'+
-    '<div id="wk-edit-body" style="height:1400px;overflow-y:auto;padding:28px 24px;background:#FAF6EF;">'+
-    '<input type="hidden" id="wk-eid" value="'+esc(entry.id)+'">'+
-    '<div style="'+FS+'"><div style="position:relative;height:220px;border-radius:20px;overflow:hidden;background:#E7DECB;cursor:pointer;" id="wk-photo-area">'+
-    '<img id="wk-photo-img" src="'+(entry.photo?esc(entry.photo):'assets/wine_photo.png')+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.src=\'assets/wine_photo.png\'">'+
-    '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);"><div style="background:rgba(30,12,10,.8);border:2px solid #D4AF37;border-radius:50%;width:70px;height:70px;display:flex;align-items:center;justify-content:center;color:#D4AF37;font-size:32px;">📷</div></div></div>'+
-    '<input type="file" id="wk-photo-input" accept="image/*" style="display:none;"></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">ワイン名</label><input id="wk-name" type="text" value="'+esc(entry.name)+'" placeholder="例: Château Margaux" style="'+IS+'"></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;'+FS+'"><div><label style="'+LS+'">タイプ</label><select id="wk-type" style="'+IS+'">'+typeOpts+'</select></div>'+
-    '<div><label style="'+LS+'">ヴィンテージ</label><input id="wk-vintage" type="text" value="'+esc(entry.vintage)+'" placeholder="例: 2020" style="'+IS+'"></div></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">産地</label><input id="wk-region" type="text" value="'+esc(entry.region)+'" placeholder="例: フランス / ボルドー" style="'+IS+'"></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">生産者</label><input id="wk-producer" type="text" value="'+esc(entry.producer)+'" placeholder="例: Château Margaux" style="'+IS+'"></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">品種</label><input id="wk-varieties" type="text" value="'+esc(entry.varieties)+'" placeholder="例: カベルネ・ソーヴィニヨン" style="'+IS+'"></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;'+FS+'"><div><label style="'+LS+'">飲んだ日</label><input id="wk-date" type="date" value="'+(entry.drinkDate?entry.drinkDate.replace(/\//g,'-'):'')+'" style="'+IS+'"></div>'+
-    '<div><label style="'+LS+'">購入価格</label><input id="wk-price" type="text" value="'+esc(entry.price)+'" placeholder="¥5,000" style="'+IS+'"></div></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">購入場所</label><input id="wk-shop" type="text" value="'+esc(entry.shop)+'" placeholder="例: ○○ワインショップ" style="'+IS+'"></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">総合評価</label><select id="wk-rating" style="'+IS+'">'+ratingOpts+'</select></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">見た目</label><textarea id="wk-look" placeholder="色合い・濃淡・透明感・粘性 など" style="'+IS+'min-height:120px;resize:vertical;">'+esc(entry.look)+'</textarea></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">香り</label><textarea id="wk-aroma" placeholder="第一印象・香りの特徴 など" style="'+IS+'min-height:120px;resize:vertical;">'+esc(entry.aroma)+'</textarea></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">味わい</label><textarea id="wk-taste" placeholder="甘辛・酸味・渋み・アルコール・余韻 など" style="'+IS+'min-height:120px;resize:vertical;">'+esc(entry.taste)+'</textarea></div>'+
-    '<div style="'+FS+'"><label style="'+LS+'">ひとこと</label><textarea id="wk-memo" placeholder="ペアリング・シーンなど自由にメモ" style="'+IS+'min-height:120px;resize:vertical;">'+esc(entry.memo)+'</textarea></div>'+
-    '<div style="height:40px;"></div></div>'+PHONE_CLOSE;
-}
-
-function showEdit(entryOrNull){
-  _screen='edit';
-  sc().innerHTML=buildEditHTML(entryOrNull);
-  reFit();
-  // Photo
-  var pa=document.getElementById('wk-photo-area'),pi=document.getElementById('wk-photo-input');
-  if(pa&&pi){
-    pa.addEventListener('click',function(){pi.click();});
-    pi.addEventListener('change',function(){
-      var file=this.files[0];if(!file)return;
-      var reader=new FileReader();
-      reader.onload=function(ev){var img=document.getElementById('wk-photo-img');if(img)img.src=ev.target.result;};
-      reader.readAsDataURL(file);
+  if (actionBtns[0]) {
+    actionBtns[0].addEventListener('click', () => {
+      const e = collectCurrentEntry();
+      const text = [
+        `ワイン名: ${e.wineName} ${e.vintage}`,
+        `タイプ: ${e.wineType}`,
+        `産地: ${e.country}`,
+        `品種: ${e.grape}`,
+        `飲んだ日: ${e.drinkDate}`,
+        '',
+        `見た目: ${e.tasteLook}`,
+        `香り: ${e.tasteAroma}`,
+        `味わい: ${e.tasteFlavor}`,
+        `ひとこと: ${e.tasteMemo}`,
+        '',
+        'このテイスティング表現を10点満点で評価し、改善点を教えてください。',
+      ].join('\n');
+      navigator.clipboard
+        ? navigator.clipboard.writeText(text).then(() => showToast('✓ コピーしました'))
+        : (document.execCommand('copy', false, text), showToast('✓ コピーしました'));
     });
   }
-  // Cancel
-  document.getElementById('wk-edit-cancel').addEventListener('click',function(){
-    if(entryOrNull){var data=loadData();var idx=0;for(var i=0;i<data.length;i++){if(data[i].id===entryOrNull.id){idx=i;break;}}showDetail(entryOrNull,idx,data);}
-    else showList();
+
+  if (actionBtns[1]) {
+    actionBtns[1].addEventListener('click', () => {
+      const e = collectCurrentEntry();
+      const text = `🍷 ${e.wineName} ${e.vintage}\n\n今日のテイスティング ✨\n\n👁 見た目: ${e.tasteLook}\n🌸 香り: ${e.tasteAroma}\n✨ 味わい: ${e.tasteFlavor}\n\n📝 ${e.tasteMemo}\n\n#ワイン #${e.wineType || 'redwine'} #テイスティング #WineNotes`;
+      navigator.clipboard
+        ? navigator.clipboard.writeText(text).then(() => showToast('✓ Instagram用テキストをコピー'))
+        : (document.execCommand('copy', false, text), showToast('✓ コピーしました'));
+    });
+  }
+}
+
+// ── List / Navigation ─────────────────────────────────────────────────────────
+const ORIGINAL_SCALER_HTML = document.getElementById('scaler').innerHTML;
+
+function showList() {
+  const arr = loadData();
+  const itemsHTML = arr.length === 0
+    ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;color:#9A8C7C;font-size:28px;gap:20px;">
+         <div>まだ記録がありません</div>
+         <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:18px 40px;font-size:26px;cursor:pointer;">最初のワインを記録する</button>
+       </div>`
+    : `<div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
+         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+           <h2 style="font-family:'Playfair Display',serif;font-size:36px;color:#241015;">コレクション</h2>
+           <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:12px 28px;font-size:22px;cursor:pointer;">+ 記録する</button>
+         </div>
+         ${arr.map(e => `
+           <div onclick="window.showEntry('${e.id}')" style="display:flex;gap:16px;background:#fff;border:1px solid #E7DECB;border-radius:24px;padding:16px;cursor:pointer;box-shadow:0 4px 12px rgba(60,30,20,.08);">
+             <img src="${e.photo || 'assets/wine_photo.png'}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:14px;flex-shrink:0;" onerror="this.src='assets/wine_photo.png'">
+             <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;">
+               <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#241015;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.wineName || '(名称未設定)'} <span style="font-size:22px;font-weight:400;">${e.vintage || ''}</span></div>
+               <div style="font-size:20px;color:#6B5B4B;">${e.drinkDate || ''} ${e.isFav ? '♥' : ''}</div>
+               <div style="font-size:20px;color:#9A8C7C;">${(e.tasteLook || '').substring(0,30)}${(e.tasteLook||'').length>30?'…':''}</div>
+             </div>
+             <button onclick="event.stopPropagation();window.deleteEntry('${e.id}')" style="background:none;border:none;color:#9A8C7C;font-size:28px;padding:8px;cursor:pointer;align-self:flex-start;">🗑</button>
+           </div>
+         `).join('')}
+       </div>`;
+  document.getElementById('scaler').innerHTML =
+    `<div style="width:1024px;min-height:100%;background:#FAF6EF;">${itemsHTML}</div>`;
+}
+
+function showEntry(id) {
+  currentId = id;
+  document.getElementById('scaler').innerHTML = ORIGINAL_SCALER_HTML;
+  reinitAll();
+  const e = loadData().find(x => x.id === id);
+  if (e) fillEntry(e);
+  if (typeof window.fitPhone === 'function') { window._nh = 0; window.fitPhone(); }
+}
+
+function showNew() {
+  currentId = NEW_ENTRY_ID;
+  document.getElementById('scaler').innerHTML = ORIGINAL_SCALER_HTML;
+  reinitAll();
+
+  const h1El = document.getElementById('v3-wine-title');
+  if (h1El) {
+    const tn = h1El.firstChild;
+    const spanEl = h1El.querySelector('span');
+    if (tn && tn.nodeType === 3) tn.textContent = '';
+    if (spanEl) spanEl.textContent = '';
+  }
+
+  const clearIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop',
+    'v3-taste-look','v3-taste-aroma','v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
+  clearIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerText = ''; });
+
+  const photoImg = document.getElementById('v3-photo');
+  if (photoImg) photoImg.src = 'assets/wine_photo.png';
+
+  const favBtn = document.getElementById('favTab');
+  if (favBtn) {
+    favBtn.dataset.fav = '0';
+    const h = favBtn.querySelector('span');
+    if (h) h.textContent = '♡';
+  }
+
+  renderStars(4.5);
+  if (typeof window.fitPhone === 'function') { window._nh = 0; window.fitPhone(); }
+}
+
+function deleteEntry(id) {
+  if (!confirm('このワイン記録を削除しますか？')) return;
+  saveData(loadData().filter(e => e.id !== id));
+  showList();
+}
+
+window.showList = showList;
+window.showNew = showNew;
+window.showEntry = showEntry;
+window.deleteEntry = deleteEntry;
+
+// ── Footer Nav ────────────────────────────────────────────────────────────────
+function enableFooterNav() {
+  const listBtn = document.getElementById('v3-nav-list');
+  const prevBtn = document.getElementById('v3-nav-prev');
+  const nextBtn = document.getElementById('v3-nav-next');
+
+  if (listBtn) listBtn.addEventListener('click', showList);
+
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    const arr = loadData();
+    if (!currentId || arr.length === 0) return;
+    const idx = arr.findIndex(e => e.id === currentId);
+    if (idx > 0) showEntry(arr[idx - 1].id);
   });
-  // Save
-  document.getElementById('wk-edit-save').addEventListener('click',function(){
-    var id=document.getElementById('wk-eid').value;
-    var rawDate=document.getElementById('wk-date').value;
-    var photoSrc=document.getElementById('wk-photo-img').src;
-    var photo=photoSrc.indexOf('data:')===0?photoSrc:(entryOrNull&&entryOrNull.photo?entryOrNull.photo:'');
-    var updated={
-      id:id,
-      name:document.getElementById('wk-name').value,
-      vintage:document.getElementById('wk-vintage').value,
-      type:document.getElementById('wk-type').value,
-      region:document.getElementById('wk-region').value,
-      producer:document.getElementById('wk-producer').value,
-      varieties:document.getElementById('wk-varieties').value,
-      drinkDate:rawDate?rawDate.replace(/-/g,'/'):'' ,
-      price:document.getElementById('wk-price').value,
-      shop:document.getElementById('wk-shop').value,
-      rating:parseFloat(document.getElementById('wk-rating').value)||0,
-      again:entryOrNull?(entryOrNull.again||'yes'):'yes',
-      favorite:entryOrNull?(entryOrNull.favorite||false):false,
-      look:document.getElementById('wk-look').value,
-      aroma:document.getElementById('wk-aroma').value,
-      taste:document.getElementById('wk-taste').value,
-      memo:document.getElementById('wk-memo').value,
-      photo:photo
-    };
-    var data=loadData();
-    var existIdx=-1;for(var i=0;i<data.length;i++){if(data[i].id===id){existIdx=i;break;}}
-    if(existIdx>=0){updated.again=data[existIdx].again||'yes';updated.favorite=data[existIdx].favorite||false;data[existIdx]=updated;}
-    else{data.unshift(updated);}
-    saveData(data);
-    var newIdx=0;for(var i=0;i<data.length;i++){if(data[i].id===id){newIdx=i;break;}}
-    showDetail(updated,newIdx,data);
-    showToast('保存しました ✓');
+
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    const arr = loadData();
+    if (!currentId || arr.length === 0) return;
+    const idx = arr.findIndex(e => e.id === currentId);
+    if (idx < arr.length - 1) showEntry(arr[idx + 1].id);
   });
 }
 
-/* ── BOOT ── */
-document.addEventListener('DOMContentLoaded',function(){
-  _origHTML=document.getElementById('scaler').innerHTML;
-  showList();
+// ── Init ──────────────────────────────────────────────────────────────────────
+function reinitAll() {
+  initDOMTargets();
+  enableInlineEdit();
+  enableDatePicker();
+  enablePhotoUpload();
+  enableStarRating();
+  enableFavToggle();
+  setupLikert();
+  enableSaveButton();
+  enableActionButtons();
+  enableFooterNav();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.PAD !== 'undefined') window.PAD = 0;
+  window._nh = 0;
+
+  reinitAll();
+
+  const arr = loadData();
+  if (arr.length > 0) {
+    currentId = arr[0].id;
+    fillEntry(arr[0]);
+  } else {
+    currentId = NEW_ENTRY_ID;
+  }
 });
+
 })();
 </script>
 </body>
