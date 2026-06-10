@@ -449,7 +449,8 @@ function initDOMTargets() {
   const h1 = document.querySelector('header ~ div .card h1');
   if (h1) h1.id = 'v3-wine-title';
 
-  const chips = document.querySelectorAll('header ~ div .card .flex.flex-wrap span');
+  // 直接子要素の span のみ取得（country chip 内の旗 span を誤拾いせぬよう）
+  const chips = document.querySelectorAll('header ~ div .card .flex.flex-wrap > span');
   if (chips[0]) chips[0].id = 'v3-chip-type';
   if (chips[1]) chips[1].id = 'v3-chip-country';
   if (chips[2]) chips[2].id = 'v3-chip-grape';
