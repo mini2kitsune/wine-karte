@@ -537,6 +537,46 @@ function setChipFilled(chip, text) {
   chip.style.background = '';
 }
 
+// 主要ワイン産地の国旗マップ
+const FLAG_MAP = {
+  'フランス':'🇫🇷','イタリア':'🇮🇹','スペイン':'🇪🇸','ドイツ':'🇩🇪',
+  'ポルトガル':'🇵🇹','オーストリア':'🇦🇹','ハンガリー':'🇭🇺','ギリシャ':'🇬🇷',
+  'ジョージア':'🇬🇪','イギリス':'🇬🇧','アメリカ':'🇺🇸','カナダ':'🇨🇦',
+  'チリ':'🇨🇱','アルゼンチン':'🇦🇷','ブラジル':'🇧🇷','ウルグアイ':'🇺🇾',
+  '南アフリカ':'🇿🇦','オーストラリア':'🇦🇺','ニュージーランド':'🇳🇿',
+  '日本':'🇯🇵','中国':'🇨🇳','韓国':'🇰🇷','ルーマニア':'🇷🇴','ブルガリア':'🇧🇬',
+  'クロアチア':'🇭🇷','スイス':'🇨🇭','スロベニア':'🇸🇮','スロバキア':'🇸🇰',
+  'チェコ':'🇨🇿','モルドバ':'🇲🇩','ウクライナ':'🇺🇦','レバノン':'🇱🇧',
+  'トルコ':'🇹🇷','イスラエル':'🇮🇱','インド':'🇮🇳','メキシコ':'🇲🇽'
+};
+
+function getCountryFlag(text) {
+  if (!text) return '';
+  for (const name in FLAG_MAP) {
+    if (text.indexOf(name) !== -1) return FLAG_MAP[name];
+  }
+  return '';
+}
+
+// 国旗付きでチップを埋める
+function setCountryChipFilled(chip, text) {
+  if (!chip) return;
+  // 既存の中身を全消し（SVG含む・絵文字に差し替えるため）
+  [...chip.childNodes].forEach(n => n.remove());
+  const flag = getCountryFlag(text);
+  if (flag) {
+    const flagSpan = document.createElement('span');
+    flagSpan.style.cssText = 'font-size:26px;flex-shrink:0;margin-right:2px;line-height:1;';
+    flagSpan.textContent = flag;
+    chip.appendChild(flagSpan);
+  }
+  chip.appendChild(document.createTextNode(text));
+  chip.style.borderStyle = '';
+  chip.style.borderColor = '';
+  chip.style.color = '';
+  chip.style.background = '';
+}
+
 // チップ3つに選択・入力機能を付与
 function enableChipEdit() {
   const WINE_TYPES = ['赤ワイン','白ワイン','ロゼ','スパークリング','甘口'];
@@ -563,7 +603,7 @@ function enableChipEdit() {
       const cur = chipCountry.innerText.trim();
       const def = (cur === '産地を入力') ? '' : cur;
       const v = prompt('産地を入力してください（例: フランス / ボルドー）:', def);
-      if (v !== null && v.trim()) setChipFilled(chipCountry, v.trim());
+      if (v !== null && v.trim()) setCountryChipFilled(chipCountry, v.trim());
     });
   }
 
