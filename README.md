@@ -51,6 +51,22 @@ GitHub リポジトリの Settings → Pages → Source: main branch → Save
 
 公開URL例: `https://mini2kitsune.github.io/wine-karte/`
 
+## 📱 ホーム画面に追加（アプリとして使う）
+
+### iOS Safari
+1. Safari でこのページを開く
+2. 画面下の「共有」ボタン（□↑）をタップ
+3. 「ホーム画面に追加」を選択
+4. 「追加」をタップ
+
+### Android Chrome
+1. Chrome でこのページを開く
+2. アドレスバー右の「⋮」をタップ
+3. 「ホーム画面に追加」または「アプリをインストール」を選択
+
+アイコンタップで全画面（ブラウザUI非表示）起動します。
+オフラインでも起動・閲覧可能です。
+
 ## データについて
 
 - **保存場所**: ブラウザのlocalStorage（端末内）

@@ -1,0 +1,22 @@
+{
+  "name": "Wine Notes — あなたのワイン日記",
+  "short_name": "Wine Notes",
+  "description": "ワインのテイスティング記録アプリ",
+  "start_url": "/wine-karte/",
+  "scope": "/wine-karte/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#5B0E1A",
+  "background_color": "#FAF6EF",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png" },
+    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png" },
+    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png" },
+    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png" },
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
