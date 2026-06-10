@@ -299,17 +299,14 @@ function fitPhone(){
   if(!sc) return;
   var isMobile = window.innerWidth <= 900;
   if (isMobile) {
-    // Mobile: scale by width, no vertical scroll (viewport-fit)
+    // Mobile: scale by width only, let vertical content scroll naturally
     sc.style.zoom = '';
     var ratio = window.innerWidth / 1024;
-    var scaledHeight = sc.offsetHeight * ratio;
-    // Adjust scale further if scaled height exceeds viewport (rare case)
-    if (scaledHeight > window.innerHeight) {
-      ratio = window.innerHeight / sc.offsetHeight;
-    }
     sc.style.transform = 'scale(' + ratio + ')';
     sc.style.transformOrigin = 'top left';
-    // No height reservation needed — stage is locked to 100vh and overflow:hidden
+    // Reserve scaled height in container so layout doesn't collapse
+    var parent = sc.parentElement;
+    if (parent) parent.style.height = (sc.offsetHeight * ratio) + 'px';
   } else {
     // Desktop: preserve original height-aware fit
     sc.style.transform = '';
@@ -345,15 +342,11 @@ window.addEventListener('resize',fitPhone);
   }
   /* Mobile: disable flex centering so transform-origin:top-left works from viewport edge */
   @media (max-width: 900px) {
-    html, body { overflow: hidden !important; }
     .stage {
       display: block !important;
       width: 100% !important;
-      height: 100vh !important;
-      min-height: 0 !important;
       justify-content: flex-start !important;
       align-items: flex-start !important;
-      overflow: hidden !important;
     }
     #scaler {
       flex: none !important;
