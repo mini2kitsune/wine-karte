@@ -240,13 +240,6 @@ tailwind.config = {
           <img src="assets/gold_leaf.png" alt="" style="width:40px;height:40px;flex-shrink:0;object-fit:contain;mix-blend-mode:multiply;">
         </div>
         <p class="text-ink" style="font-size:22px;line-height:1.8;">香りの表現がとても素敵です。特に<span class="text-bordeaux-soft font-semibold">「杉やバニラ」</span>というニュアンスは、このワインの樽熟による特徴をよく捉えていますね。力強さとエレガンスが共存する、素晴らしい一本を楽しまれたようです 🍷</p>
-        <!-- AI tags -->
-        <div class="flex flex-wrap" style="gap:10px;">
-          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">カシス系果実</span>
-          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">樽のニュアンス</span>
-          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">バランスが良い</span>
-          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">長い余韻</span>
-        </div>
     </div>
   </div>
 
@@ -531,6 +524,59 @@ function resetChipsToEmpty() {
   setChipEmpty(chipGrape,   '品種を入力');
 }
 window.resetChipsToEmpty = resetChipsToEmpty;
+
+// チップ値を埋めて装飾を通常状態に戻す
+function setChipFilled(chip, text) {
+  if (!chip) return;
+  [...chip.childNodes].forEach(n => { if (n.nodeType === 3) n.remove(); });
+  chip.appendChild(document.createTextNode(text));
+  chip.style.borderStyle = '';
+  chip.style.borderColor = '';
+  chip.style.color = '';
+  chip.style.background = '';
+}
+
+// チップ3つに選択・入力機能を付与
+function enableChipEdit() {
+  const WINE_TYPES = ['赤ワイン','白ワイン','ロゼ','スパークリング','甘口'];
+  const chipType    = document.getElementById('v3-chip-type');
+  const chipCountry = document.getElementById('v3-chip-country');
+  const chipGrape   = document.getElementById('v3-chip-grape');
+
+  if (chipType) {
+    chipType.style.cursor = 'pointer';
+    chipType.addEventListener('click', () => {
+      const choice = prompt(
+        '種類を選択してください（番号入力）:\n' +
+        '1: 赤ワイン\n2: 白ワイン\n3: ロゼ\n4: スパークリング\n5: 甘口'
+      );
+      if (choice && /^[1-5]$/.test(choice.trim())) {
+        setChipFilled(chipType, WINE_TYPES[parseInt(choice.trim()) - 1]);
+      }
+    });
+  }
+
+  if (chipCountry) {
+    chipCountry.style.cursor = 'pointer';
+    chipCountry.addEventListener('click', () => {
+      const cur = chipCountry.innerText.trim();
+      const def = (cur === '産地を入力') ? '' : cur;
+      const v = prompt('産地を入力してください（例: フランス / ボルドー）:', def);
+      if (v !== null && v.trim()) setChipFilled(chipCountry, v.trim());
+    });
+  }
+
+  if (chipGrape) {
+    chipGrape.style.cursor = 'pointer';
+    chipGrape.addEventListener('click', () => {
+      const cur = chipGrape.innerText.trim();
+      const def = (cur === '品種を入力') ? '' : cur;
+      const v = prompt('品種を入力してください（例: カベルネ・ソーヴィニヨン）:', def);
+      if (v !== null && v.trim()) setChipFilled(chipGrape, v.trim());
+    });
+  }
+}
+window.enableChipEdit = enableChipEdit;
 
 // ── Inline Edit ───────────────────────────────────────────────────────────────
 function enableInlineEdit() {
@@ -969,6 +1015,7 @@ function enableFooterNav() {
 function reinitAll() {
   initDOMTargets();
   enableInlineEdit();
+  enableChipEdit();
   enableDatePicker();
   enablePhotoUpload();
   enableStarRating();
