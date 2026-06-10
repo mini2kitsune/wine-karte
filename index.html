@@ -329,7 +329,7 @@ window.addEventListener('resize',fitPhone);
 </script>
 
 <style id="v3-mobile-override">
-  body { background: #FAF6EF !important; overflow: auto !important; }
+  body { background: #FAF6EF !important; overflow-x: hidden !important; overflow-y: auto !important; }
   .stage {
     padding: 0 !important;
     background: none !important;
@@ -339,6 +339,19 @@ window.addEventListener('resize',fitPhone);
   .stage > div > div:first-child {
     border-radius: 0 !important;
     box-shadow: none !important;
+  }
+  /* Mobile: disable flex centering so transform-origin:top-left works from viewport edge */
+  @media (max-width: 900px) {
+    .stage {
+      display: block !important;
+      width: 100% !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+    }
+    #scaler {
+      flex: none !important;
+      margin: 0 !important;
+    }
   }
 </style>
 
