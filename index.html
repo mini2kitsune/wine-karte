@@ -992,7 +992,8 @@ document.addEventListener('DOMContentLoaded', function() {
     currentId = arr[0].id;
     fillEntry(arr[0]);
   } else {
-    currentId = NEW_ENTRY_ID;
+    // 初回起動: テンプレート文言を空状態に切替えて『新しい記録』モードを表示
+    showNew();
   }
 });
 
