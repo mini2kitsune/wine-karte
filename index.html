@@ -353,6 +353,34 @@ window.addEventListener('resize',fitPhone);
       margin: 0 !important;
     }
   }
+  /* ── 空状態プレースホルダ ── */
+  [data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: #C8B89A;
+    font-weight: 400;
+    font-style: normal;
+    pointer-events: none;
+  }
+  /* テイスティングテキストは italic */
+  #v3-taste-look[data-placeholder]:empty::before,
+  #v3-taste-aroma[data-placeholder]:empty::before,
+  #v3-taste-flavor[data-placeholder]:empty::before,
+  #v3-taste-memo[data-placeholder]:empty::before {
+    font-style: italic;
+  }
+  /* 写真プレースホルダ overlay */
+  #v3-photo-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #F4EDE2;
+    gap: 14px;
+    pointer-events: none;
+  }
+  #v3-photo-placeholder.hidden { display: none; }
 </style>
 
 <script>
@@ -410,8 +438,11 @@ function renderStars(rating) {
   starsDiv.innerHTML = html;
   const ratingEl = document.getElementById('v3-rating-num');
   if (ratingEl) {
-    const tn = ratingEl.firstChild;
-    if (tn && tn.nodeType === 3) tn.textContent = rating.toFixed(1) + ' ';
+    const firstNode = ratingEl.childNodes[0];
+    const displayText = currentRating === 0 ? '— ' : currentRating.toFixed(1) + ' ';
+    if (firstNode && firstNode.nodeType === 3) firstNode.textContent = displayText;
+    const span = ratingEl.querySelector('span');
+    if (span) span.style.color = currentRating === 0 ? '#C8B89A' : '';
   }
 }
 
@@ -450,7 +481,51 @@ function initDOMTargets() {
   if (navBtns[0]) navBtns[0].id = 'v3-nav-prev';
   if (navBtns[1]) navBtns[1].id = 'v3-nav-list';
   if (navBtns[2]) navBtns[2].id = 'v3-nav-next';
+
+  // data-placeholder 付与
+  const placeholders = {
+    'v3-wine-title':      'ワイン名を入力してください',
+    'v3-meta-producer':   '—',
+    'v3-meta-vintage':    '—',
+    'v3-meta-date':       '未入力',
+    'v3-meta-price':      '未入力',
+    'v3-meta-shop':       '未入力',
+    'v3-taste-look':      '印象を自由に記録してください…',
+    'v3-taste-aroma':     '感じた香りを記録してください…',
+    'v3-taste-flavor':    '味の印象を記録してください…',
+    'v3-taste-memo':      'ペアリングや感想を自由にメモ…',
+    'v3-ai-comment':      'テイスティングノートを記入すると、AIソムリエ ピノが優しくコメントしてくれます。あなたの感想を聞かせてください 🍷',
+  };
+  Object.entries(placeholders).forEach(([id, ph]) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('data-placeholder', ph);
+  });
 }
+
+// ── Chip Empty State ──────────────────────────────────────────────────────────
+function setChipEmpty(chip, placeholder) {
+  if (!chip) return;
+  chip.querySelectorAll('*:not(svg):not(svg *)').forEach(el => {
+    if (el.nodeType === 1 && !el.querySelector('svg')) el.remove();
+  });
+  const tn = [...chip.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+  if (tn) tn.textContent = placeholder;
+  else chip.appendChild(document.createTextNode(placeholder));
+  chip.style.borderStyle = 'dashed';
+  chip.style.borderColor = '#E7DECB';
+  chip.style.color = '#C8B89A';
+  chip.style.background = 'transparent';
+}
+
+function resetChipsToEmpty() {
+  const chipType    = document.getElementById('v3-chip-type');
+  const chipCountry = document.getElementById('v3-chip-country');
+  const chipGrape   = document.getElementById('v3-chip-grape');
+  setChipEmpty(chipType,    '種類を選択');
+  setChipEmpty(chipCountry, '産地を入力');
+  setChipEmpty(chipGrape,   '品種を入力');
+}
+window.resetChipsToEmpty = resetChipsToEmpty;
 
 // ── Inline Edit ───────────────────────────────────────────────────────────────
 function enableInlineEdit() {
@@ -507,11 +582,41 @@ function enablePhotoUpload() {
   fileInp.style.display = 'none';
   document.body.appendChild(fileInp);
   photoBtn.addEventListener('click', () => fileInp.click());
+
+  // 写真プレースホルダ overlay を挿入
+  const photoContainer = photoImg ? photoImg.parentElement : null;
+  if (photoContainer && !document.getElementById('v3-photo-placeholder')) {
+    const ph = document.createElement('div');
+    ph.id = 'v3-photo-placeholder';
+    ph.innerHTML = `
+      <svg viewBox="0 0 24 24" style="width:64px;height:64px;color:#C49B3A;opacity:.5;" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+        <circle cx="12" cy="13" r="4"></circle>
+      </svg>
+      <div style="font-size:20px;color:#C49B3A;opacity:.7;">写真を追加</div>`;
+    photoContainer.appendChild(ph);
+  }
+
+  // 写真変更時に overlay を隠す
+  function updatePhotoPlaceholder() {
+    const overlay = document.getElementById('v3-photo-placeholder');
+    if (!overlay) return;
+    const isDefault = !photoImg.src || photoImg.src.includes('wine_photo.png') ||
+                      photoImg.src === window.location.href;
+    overlay.classList.toggle('hidden', !isDefault);
+  }
+  window.updatePhotoPlaceholder = updatePhotoPlaceholder;
+
+  if (photoImg) {
+    photoImg.style.display = 'block';
+    updatePhotoPlaceholder();
+  }
+
   fileInp.addEventListener('change', () => {
     const file = fileInp.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = e => { photoImg.src = e.target.result; };
+    reader.onload = e => { photoImg.src = e.target.result; updatePhotoPlaceholder(); };
     reader.readAsDataURL(file);
   });
 }
@@ -529,7 +634,12 @@ function enableStarRating() {
     const half = (x % starW) < starW / 2;
     renderStars(half ? idx + 0.5 : idx + 1);
   });
-  renderStars(currentRating);
+  if (currentId === NEW_ENTRY_ID) {
+    currentRating = 0;
+    renderStars(0);
+  } else {
+    renderStars(currentRating);
+  }
 }
 
 // ── Fav Toggle ────────────────────────────────────────────────────────────────
@@ -802,7 +912,17 @@ function showNew() {
     if (h) h.textContent = '♡';
   }
 
-  renderStars(4.5);
+  // 写真を空状態に
+  window.updatePhotoPlaceholder && window.updatePhotoPlaceholder();
+
+  // チップを空状態に
+  window.resetChipsToEmpty && window.resetChipsToEmpty();
+
+  // 評価を 0（未設定）に
+  if (typeof renderStars === 'function') {
+    window._currentRating = 0;
+    renderStars(0);
+  }
   if (typeof window.fitPhone === 'function') { window._nh = 0; window.fitPhone(); }
 }
 
