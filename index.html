@@ -292,16 +292,34 @@ document.querySelectorAll('#likert .opt').forEach(function(b){
   });
 });
 
-// Zoom to fit — height-aware with minimum width-based floor
+// Zoom to fit — mobile: width-only scale (vertical scrolls); desktop: minimal fit
 var _nh=0;
-var PAD=28*2;
 function fitPhone(){
   var sc=document.getElementById('scaler');
-  sc.style.zoom=1;
-  if(!_nh) _nh=sc.offsetHeight;
-  var zW=(window.innerWidth-PAD)/1024;
-  var zH=(window.innerHeight-PAD)/_nh;
-  sc.style.zoom=Math.min(zW,zH)*0.97;
+  if(!sc) return;
+  var isMobile = window.innerWidth <= 900;
+  if (isMobile) {
+    // Mobile: scale by width only, let vertical content scroll naturally
+    sc.style.zoom = '';
+    var ratio = window.innerWidth / 1024;
+    sc.style.transform = 'scale(' + ratio + ')';
+    sc.style.transformOrigin = 'top left';
+    // Reserve scaled height in container so layout doesn't collapse
+    var parent = sc.parentElement;
+    if (parent) parent.style.height = (sc.offsetHeight * ratio) + 'px';
+  } else {
+    // Desktop: preserve original height-aware fit
+    sc.style.transform = '';
+    sc.style.transformOrigin = '';
+    var parent = sc.parentElement;
+    if (parent) parent.style.height = '';
+    sc.style.zoom = 1;
+    if(!_nh) _nh=sc.offsetHeight;
+    var PAD=28*2;
+    var zW=(window.innerWidth-PAD)/1024;
+    var zH=(window.innerHeight-PAD)/_nh;
+    sc.style.zoom=Math.min(zW,zH)*0.97;
+  }
 }
 document.addEventListener('DOMContentLoaded',function(){
   fitPhone();
