@@ -299,14 +299,19 @@ function fitPhone(){
   if(!sc) return;
   var isMobile = window.innerWidth <= 900;
   if (isMobile) {
-    // Mobile: scale by width only, let vertical content scroll naturally
+    // Mobile: scale by width, stage fixed to scaled content height (no empty scroll area)
     sc.style.zoom = '';
     var ratio = window.innerWidth / 1024;
     sc.style.transform = 'scale(' + ratio + ')';
     sc.style.transformOrigin = 'top left';
-    // Reserve scaled height in container so layout doesn't collapse
     var parent = sc.parentElement;
-    if (parent) parent.style.height = (sc.offsetHeight * ratio) + 'px';
+    if (parent) {
+      var h = sc.offsetHeight * ratio;
+      parent.style.setProperty('height', h + 'px', 'important');
+      parent.style.setProperty('min-height', '0', 'important');
+    }
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
   } else {
     // Desktop: preserve original height-aware fit
     sc.style.transform = '';
