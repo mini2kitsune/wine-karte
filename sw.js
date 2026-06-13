@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wine-notes-v4';
+const CACHE_NAME = 'wine-notes-v5';
 const STATIC_ASSETS = [
   '/wine-karte/',
   '/wine-karte/index.html',

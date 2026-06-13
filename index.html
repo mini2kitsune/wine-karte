@@ -680,7 +680,6 @@ function enablePhotoUpload() {
   const fileInp = document.createElement('input');
   fileInp.type = 'file';
   fileInp.accept = 'image/*';
-  fileInp.capture = 'environment';
   fileInp.style.display = 'none';
   document.body.appendChild(fileInp);
   photoBtn.addEventListener('click', () => fileInp.click());
