@@ -383,9 +383,12 @@ window.addEventListener('resize',fitPhone);
     justify-content: center;
     background: #F4EDE2;
     gap: 14px;
-    pointer-events: none;
+    cursor: pointer;
+    z-index: 1;
   }
   #v3-photo-placeholder.hidden { display: none; }
+  /* カメラボタンは常にプレースホルダより上 */
+  .card .relative > button { z-index: 2; }
 </style>
 
 <script>
@@ -693,6 +696,7 @@ function enablePhotoUpload() {
         <circle cx="12" cy="13" r="4"></circle>
       </svg>
       <div style="font-size:20px;color:#C49B3A;opacity:.7;">写真を追加</div>`;
+    ph.addEventListener('click', () => fileInp.click());
     photoContainer.appendChild(ph);
   }
 
