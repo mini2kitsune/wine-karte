@@ -397,6 +397,11 @@ window.addEventListener('resize',fitPhone);
     line-height: 1.35;
     align-items: flex-start !important;
   }
+  /* テイスティング項目は入力中も明朝体を維持（iOS Safari contenteditable対策）*/
+  #v3-taste-look, #v3-taste-aroma, #v3-taste-flavor, #v3-taste-memo,
+  #v3-taste-look:focus, #v3-taste-aroma:focus, #v3-taste-flavor:focus, #v3-taste-memo:focus {
+    font-family: "Noto Serif JP", serif !important;
+  }
 </style>
 
 <script>
@@ -412,10 +417,38 @@ function loadData() {
 }
 
 function saveData(arr) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-  catch(e) {
-    if (e.name === 'QuotaExceededError') showToast('容量不足です。写真を削除してください。');
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    return true;
+  } catch(e) {
+    if (e.name === 'QuotaExceededError') showToast('容量不足です。古い写真を整理してください');
+    else showToast('保存に失敗しました');
+    return false;
   }
+}
+
+// 画像を最大1200px幅・JPEG 80%に圧縮（容量超過対策）
+function compressImage(file, maxWidth, quality) {
+  maxWidth = maxWidth || 1200;
+  quality = quality || 0.8;
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function showToast(msg) {
@@ -757,12 +790,20 @@ function enablePhotoUpload() {
     updatePhotoPlaceholder();
   }
 
-  fileInp.addEventListener('change', () => {
+  fileInp.addEventListener('change', async () => {
     const file = fileInp.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => { photoImg.src = e.target.result; updatePhotoPlaceholder(); };
-    reader.readAsDataURL(file);
+    try {
+      // 圧縮して容量超過を防ぐ（最大1200px幅・JPEG 80%）
+      const dataUrl = await compressImage(file);
+      photoImg.src = dataUrl;
+      updatePhotoPlaceholder();
+    } catch (err) {
+      showToast('写真の処理に失敗しました');
+    } finally {
+      // 同じファイルを連続選択できるようリセット
+      fileInp.value = '';
+    }
   });
 }
 
@@ -822,6 +863,13 @@ function collectCurrentEntry() {
     const el = document.getElementById(id);
     return el ? el.innerText.trim() : '';
   }
+  // チップのテキストがプレースホルダの場合は空文字として扱う
+  function getChipText(id, placeholder) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    const t = el.innerText.trim();
+    return (t === placeholder || t === '') ? '' : t;
+  }
 
   const h1El = document.getElementById('v3-wine-title');
   let wineName = '', vintage = '';
@@ -851,9 +899,9 @@ function collectCurrentEntry() {
     wineName,
     vintage,
     producer:    getText('v3-meta-producer'),
-    country:     document.getElementById('v3-chip-country') ? document.getElementById('v3-chip-country').innerText.trim() : '',
-    grape:       document.getElementById('v3-chip-grape')   ? document.getElementById('v3-chip-grape').innerText.trim()   : '',
-    wineType:    document.getElementById('v3-chip-type')    ? document.getElementById('v3-chip-type').innerText.trim()    : '',
+    country:     getChipText('v3-chip-country', '産地を入力'),
+    grape:       getChipText('v3-chip-grape',   '品種を入力'),
+    wineType:    getChipText('v3-chip-type',    '種類を選択'),
     drinkDate:   getText('v3-meta-date'),
     price:       getText('v3-meta-price'),
     shop:        getText('v3-meta-shop'),
@@ -896,9 +944,28 @@ function fillEntry(entry) {
   setText('v3-taste-memo',    entry.tasteMemo);
   setText('v3-ai-comment',    entry.aiComment);
 
-  if (entry.photo) {
-    const photoImg = document.getElementById('v3-photo');
-    if (photoImg) photoImg.src = entry.photo;
+  // 写真は常にリセット（前のエントリの残像を防ぐ）
+  const photoImg = document.getElementById('v3-photo');
+  if (photoImg) {
+    photoImg.src = entry.photo || 'assets/wine_photo.png';
+  }
+  if (typeof window.updatePhotoPlaceholder === 'function') window.updatePhotoPlaceholder();
+
+  // 3チップを正しく復元（値があればfilled、なければempty）
+  const chipType    = document.getElementById('v3-chip-type');
+  const chipCountry = document.getElementById('v3-chip-country');
+  const chipGrape   = document.getElementById('v3-chip-grape');
+  if (chipType) {
+    if (entry.wineType && entry.wineType !== '種類を選択') setChipFilled(chipType, entry.wineType);
+    else setChipEmpty(chipType, '種類を選択');
+  }
+  if (chipCountry) {
+    if (entry.country && entry.country !== '産地を入力') setCountryChipFilled(chipCountry, entry.country);
+    else setChipEmpty(chipCountry, '産地を入力');
+  }
+  if (chipGrape) {
+    if (entry.grape && entry.grape !== '品種を入力') setChipFilled(chipGrape, entry.grape);
+    else setChipEmpty(chipGrape, '品種を入力');
   }
 
   renderStars(entry.rating || 4.5);
@@ -947,8 +1014,9 @@ function enableSaveButton() {
       currentId = entry.id;
       arr.unshift(entry);
     }
-    saveData(arr);
-    showToast('✓ 保存しました');
+    const ok = saveData(arr);
+    if (ok) showToast('✓ 保存しました');
+    // 失敗時は saveData 内でエラートーストが出る
   });
 }
 
