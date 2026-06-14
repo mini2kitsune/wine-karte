@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Wine Notes — design preview</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#5B0E1A">
@@ -251,7 +251,7 @@ tailwind.config = {
   </div>
 
   <!-- FOOTER — target 45px -->
-  <nav class="flex items-center border-t border-hair bg-ivory" style="padding:10px 14px;margin-top:14px;">
+  <nav id="in-phone-nav" class="flex items-center border-t border-hair bg-ivory" style="padding:10px 14px;margin-top:14px;">
     <button class="flex-1 flex items-center justify-center text-ink-soft" style="gap:10px;font-size:24px;">
       <svg viewBox="0 0 24 24" style="width:30px;height:30px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>前のワイン</button>
     <div class="bg-hair" style="width:1px;height:36px;"></div>
@@ -266,6 +266,22 @@ tailwind.config = {
 </div><!-- /phone -->
 </div><!-- /scaler -->
 </div><!-- /stage -->
+
+<!-- Mobile-only fixed bottom nav (escapes scaler transform context to stay pinned) -->
+<nav id="m-bottom-nav" aria-label="ワイン切替">
+  <button id="m-nav-prev" type="button">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A9842A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    <span>前のワイン</span>
+  </button>
+  <button id="m-nav-list" type="button">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A9842A" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>
+    <span>一覧</span>
+  </button>
+  <button id="m-nav-next" type="button">
+    <span>次のワイン</span>
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A9842A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
+</nav>
 
 <script>
 // Stars 4.5
@@ -310,8 +326,9 @@ function fitPhone(){
       parent.style.setProperty('height', h + 'px', 'important');
       parent.style.setProperty('min-height', '0', 'important');
     }
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
+    // Allow body to scroll so all content (and fixed bottom nav padding) is reachable
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   } else {
     // Desktop: preserve original height-aware fit
     sc.style.transform = '';
@@ -319,7 +336,8 @@ function fitPhone(){
     var parent = sc.parentElement;
     if (parent) parent.style.height = '';
     sc.style.zoom = 1;
-    if(!_nh) _nh=sc.offsetHeight;
+    // Always remeasure: cached _nh caused nav to overflow when switching between entries of different heights
+    _nh=sc.offsetHeight;
     var PAD=28*2;
     var zW=(window.innerWidth-PAD)/1024;
     var zH=(window.innerHeight-PAD)/_nh;
@@ -352,11 +370,50 @@ window.addEventListener('resize',fitPhone);
       width: 100% !important;
       justify-content: flex-start !important;
       align-items: flex-start !important;
+      padding-bottom: 76px !important; /* leave room for fixed bottom nav */
     }
     #scaler {
       flex: none !important;
       margin: 0 !important;
     }
+    /* hide in-phone nav on mobile — replaced by fixed bottom nav (#m-bottom-nav) */
+    #in-phone-nav { display: none !important; }
+  }
+
+  /* Fixed bottom nav — mobile only, lives outside scaler to escape transform */
+  #m-bottom-nav { display: none; }
+  @media (max-width: 900px) {
+    #m-bottom-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: #FAF6EF;
+      border-top: 1px solid #E7DECB;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom)) 10px;
+      box-sizing: border-box;
+      box-shadow: 0 -6px 18px rgba(60,30,20,.08);
+    }
+    #m-bottom-nav button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: "Noto Serif JP", serif;
+      font-size: 15px;
+      color: #4A3F35;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px 4px;
+      min-height: 44px; /* iOS tap target */
+      -webkit-tap-highlight-color: rgba(169,132,42,.18);
+    }
+    #m-bottom-nav button + button { border-left: 1px solid #E7DECB; }
+    #m-bottom-nav #m-nav-list { font-weight: 600; color: #2c1116; }
   }
   /* ── 空状態プレースホルダ ── */
   [data-placeholder]:empty::before {
@@ -527,7 +584,7 @@ function initDOMTargets() {
   const headerBtns = document.querySelectorAll('header button');
   if (headerBtns[1]) headerBtns[1].id = 'v3-save-btn';
 
-  const navBtns = document.querySelectorAll('nav button');
+  const navBtns = document.querySelectorAll('#in-phone-nav button');
   if (navBtns[0]) navBtns[0].id = 'v3-nav-prev';
   if (navBtns[1]) navBtns[1].id = 'v3-nav-list';
   if (navBtns[2]) navBtns[2].id = 'v3-nav-next';
@@ -1151,26 +1208,38 @@ window.showEntry = showEntry;
 window.deleteEntry = deleteEntry;
 
 // ── Footer Nav ────────────────────────────────────────────────────────────────
+function gotoPrev() {
+  const arr = loadData();
+  if (!currentId || arr.length === 0) return;
+  const idx = arr.findIndex(e => e.id === currentId);
+  if (idx > 0) showEntry(arr[idx - 1].id);
+}
+function gotoNext() {
+  const arr = loadData();
+  if (!currentId || arr.length === 0) return;
+  const idx = arr.findIndex(e => e.id === currentId);
+  if (idx >= 0 && idx < arr.length - 1) showEntry(arr[idx + 1].id);
+}
+
 function enableFooterNav() {
   const listBtn = document.getElementById('v3-nav-list');
   const prevBtn = document.getElementById('v3-nav-prev');
   const nextBtn = document.getElementById('v3-nav-next');
 
   if (listBtn) listBtn.addEventListener('click', showList);
+  if (prevBtn) prevBtn.addEventListener('click', gotoPrev);
+  if (nextBtn) nextBtn.addEventListener('click', gotoNext);
+}
 
-  if (prevBtn) prevBtn.addEventListener('click', () => {
-    const arr = loadData();
-    if (!currentId || arr.length === 0) return;
-    const idx = arr.findIndex(e => e.id === currentId);
-    if (idx > 0) showEntry(arr[idx - 1].id);
-  });
-
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    const arr = loadData();
-    if (!currentId || arr.length === 0) return;
-    const idx = arr.findIndex(e => e.id === currentId);
-    if (idx < arr.length - 1) showEntry(arr[idx + 1].id);
-  });
+// Fixed mobile bottom nav lives OUTSIDE #scaler (escapes transform:scale containing block).
+// Wired up once at DOMContentLoaded since it is never re-rendered by showEntry().
+function enableMobileFixedNav() {
+  const mList = document.getElementById('m-nav-list');
+  const mPrev = document.getElementById('m-nav-prev');
+  const mNext = document.getElementById('m-nav-next');
+  if (mList && !mList.dataset.wired) { mList.addEventListener('click', showList); mList.dataset.wired = '1'; }
+  if (mPrev && !mPrev.dataset.wired) { mPrev.addEventListener('click', gotoPrev); mPrev.dataset.wired = '1'; }
+  if (mNext && !mNext.dataset.wired) { mNext.addEventListener('click', gotoNext); mNext.dataset.wired = '1'; }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -1193,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window._nh = 0;
 
   reinitAll();
+  enableMobileFixedNav();
 
   const arr = loadData();
   if (arr.length > 0) {
