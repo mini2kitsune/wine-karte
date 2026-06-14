@@ -389,12 +389,13 @@ window.addEventListener('resize',fitPhone);
   #v3-photo-placeholder.hidden { display: none; }
   /* カメラボタンは常にプレースホルダより上 */
   .card .relative > button { z-index: 2; }
-  /* 品種チップは長文時に折り返して全文表示 */
+  /* 品種チップは複数品種を改行して縦並びで読みやすく */
   #v3-chip-grape {
-    white-space: normal !important;
+    white-space: pre-line !important;
     word-break: break-word;
     max-width: 100%;
-    line-height: 1.25;
+    line-height: 1.35;
+    align-items: flex-start !important;
   }
 </style>
 
@@ -547,7 +548,11 @@ window.resetChipsToEmpty = resetChipsToEmpty;
 function setChipFilled(chip, text) {
   if (!chip) return;
   [...chip.childNodes].forEach(n => { if (n.nodeType === 3) n.remove(); });
-  chip.appendChild(document.createTextNode(text));
+  // 品種チップは、・カンマを改行に変換して縦並びで表示
+  const displayText = (chip.id === 'v3-chip-grape')
+    ? text.replace(/\s*[、,]\s*/g, '\n')
+    : text;
+  chip.appendChild(document.createTextNode(displayText));
   chip.style.borderStyle = '';
   chip.style.borderColor = '';
   chip.style.color = '';
@@ -627,9 +632,10 @@ function enableChipEdit() {
   if (chipGrape) {
     chipGrape.style.cursor = 'pointer';
     chipGrape.addEventListener('click', () => {
-      const cur = chipGrape.innerText.trim();
+      // 編集時は改行を「、」に戻して表示（殿が入力しやすい形に）
+      const cur = chipGrape.innerText.trim().replace(/\n+/g, '、');
       const def = (cur === '品種を入力') ? '' : cur;
-      const v = prompt('品種を入力してください（例: カベルネ・ソーヴィニヨン）:', def);
+      const v = prompt('品種を入力してください（複数は「、」で区切る・例: カベルネ・ソーヴィニヨン、メルロー）:', def);
       if (v !== null && v.trim()) setChipFilled(chipGrape, v.trim());
     });
   }
