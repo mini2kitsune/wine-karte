@@ -631,16 +631,46 @@ function enableChipEdit() {
 
   if (chipGrape) {
     chipGrape.style.cursor = 'pointer';
-    chipGrape.addEventListener('click', () => {
-      // 編集時は改行を「、」に戻して表示（殿が入力しやすい形に）
-      const cur = chipGrape.innerText.trim().replace(/\n+/g, '、');
+    chipGrape.addEventListener('click', async () => {
+      const cur = chipGrape.innerText.trim();
       const def = (cur === '品種を入力') ? '' : cur;
-      const v = prompt('品種を入力してください（複数は「、」で区切る・例: カベルネ・ソーヴィニヨン、メルロー）:', def);
+      const v = await showGrapeDialog(def);
       if (v !== null && v.trim()) setChipFilled(chipGrape, v.trim());
     });
   }
 }
 window.enableChipEdit = enableChipEdit;
+
+// 品種入力用ダイアログ（改行入力対応・textareaベース）
+function showGrapeDialog(currentValue) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(20,10,12,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#FAF6EF;border-radius:24px;padding:24px;width:100%;max-width:480px;box-shadow:0 24px 80px rgba(0,0,0,.4);';
+    box.innerHTML =
+      '<div style="font-size:24px;color:#3D070F;margin-bottom:8px;font-weight:600;">品種を入力</div>' +
+      '<div style="font-size:16px;color:#6B5840;margin-bottom:14px;line-height:1.4;">複数の品種は<b>改行（Enter）</b>または「、」で区切ってください</div>' +
+      '<textarea style="width:100%;min-height:160px;padding:14px;font-size:20px;border:2px solid #D4AF37;border-radius:14px;outline:none;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff;line-height:1.5;"></textarea>' +
+      '<div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">' +
+        '<button data-cancel style="padding:10px 24px;font-size:18px;background:transparent;border:2px solid #C8B89A;color:#6B5840;border-radius:24px;cursor:pointer;">キャンセル</button>' +
+        '<button data-ok style="padding:10px 24px;font-size:18px;background:#5B0E1A;border:2px solid #5B0E1A;color:#FAF6EF;border-radius:24px;cursor:pointer;font-weight:600;">保存</button>' +
+      '</div>';
+    const ta = box.querySelector('textarea');
+    ta.value = currentValue;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 50);
+
+    const close = (value) => {
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      resolve(value);
+    };
+    box.querySelector('[data-cancel]').addEventListener('click', () => close(null));
+    box.querySelector('[data-ok]').addEventListener('click', () => close(ta.value));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(null); });
+  });
+}
 
 // ── Inline Edit ───────────────────────────────────────────────────────────────
 function enableInlineEdit() {
