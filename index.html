@@ -389,6 +389,13 @@ window.addEventListener('resize',fitPhone);
   #v3-photo-placeholder.hidden { display: none; }
   /* カメラボタンは常にプレースホルダより上 */
   .card .relative > button { z-index: 2; }
+  /* 品種チップは長文時に折り返して全文表示 */
+  #v3-chip-grape {
+    white-space: normal !important;
+    word-break: break-word;
+    max-width: 100%;
+    line-height: 1.25;
+  }
 </style>
 
 <script>
