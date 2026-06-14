@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wine Notes — design preview</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#5B0E1A">
@@ -322,11 +322,13 @@ function fitPhone(){
     sc.style.transformOrigin = 'top left';
     var parent = sc.parentElement;
     if (parent) {
-      var h = sc.offsetHeight * ratio;
+      // Add 80px to leave scrollable room below the scaled content for the fixed bottom nav
+      // (so AI sommelier comment is not hidden by the fixed nav overlay)
+      var h = sc.offsetHeight * ratio + 80;
       parent.style.setProperty('height', h + 'px', 'important');
       parent.style.setProperty('min-height', '0', 'important');
     }
-    // Allow body to scroll so all content (and fixed bottom nav padding) is reachable
+    // Allow body to scroll so all content is reachable
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
   } else {
@@ -370,7 +372,6 @@ window.addEventListener('resize',fitPhone);
       width: 100% !important;
       justify-content: flex-start !important;
       align-items: flex-start !important;
-      padding-bottom: 76px !important; /* leave room for fixed bottom nav */
     }
     #scaler {
       flex: none !important;
