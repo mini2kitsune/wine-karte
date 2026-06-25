@@ -951,26 +951,23 @@ function enableInlineEdit() {
 // ── Date Picker ───────────────────────────────────────────────────────────────
 function enableDatePicker() {
   const dateDd = document.getElementById('v3-meta-date');
-  if (!dateDd || dateDd.dataset.dpBound) return;
-  dateDd.dataset.dpBound = '1';
+  if (!dateDd) return;
   dateDd.removeAttribute('contenteditable');
+  dateDd.style.position = 'relative';
   dateDd.style.cursor = 'pointer';
-  dateDd.addEventListener('click', function() {
-    document.querySelectorAll('input[data-wn-date]').forEach(el => el.remove());
-    const inp = document.createElement('input');
-    inp.type = 'date';
-    inp.dataset.wnDate = '1';
-    inp.style.cssText = 'position:fixed;top:-200px;left:-200px;opacity:0.01;width:1px;height:1px;';
-    document.body.appendChild(inp);
-    inp.addEventListener('change', function() {
-      if (!inp.value) { inp.remove(); return; }
-      const d = new Date(inp.value + 'T12:00:00');
-      const days = ['日','月','火','水','木','金','土'];
-      dateDd.innerText = `${d.getFullYear()} / ${String(d.getMonth()+1).padStart(2,'0')} / ${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
-      inp.remove();
-    });
-    inp.focus();
-    inp.click();
+  dateDd.querySelectorAll('input[type="date"]').forEach(el => el.remove());
+  const inp = document.createElement('input');
+  inp.type = 'date';
+  inp.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;border:none;padding:0;margin:0;background:transparent;-webkit-appearance:none;';
+  dateDd.appendChild(inp);
+  inp.addEventListener('change', function() {
+    if (!inp.value) return;
+    const d = new Date(inp.value + 'T12:00:00');
+    const days = ['日','月','火','水','木','金','土'];
+    const fmt = `${d.getFullYear()} / ${String(d.getMonth()+1).padStart(2,'0')} / ${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
+    const tn = [...dateDd.childNodes].find(n => n.nodeType === 3);
+    if (tn) tn.textContent = fmt;
+    else dateDd.insertBefore(document.createTextNode(fmt), dateDd.firstChild);
   });
 }
 
@@ -1424,6 +1421,7 @@ function showEntry(id) {
   reinitAll();
   const e = loadData().find(x => x.id === id);
   if (e) fillEntry(e);
+  enableDatePicker();
   if (typeof window.fitPhone === 'function') { window._nh = 0; window.fitPhone(); }
 }
 
