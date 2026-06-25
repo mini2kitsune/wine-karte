@@ -805,8 +805,8 @@ window.resetChipsToEmpty = resetChipsToEmpty;
 // チップ値を埋めて装飾を通常状態に戻す
 function setChipFilled(chip, text) {
   if (!chip) return;
+  chip.dataset.wnValue = text;
   [...chip.childNodes].forEach(n => { if (n.nodeType === 3) n.remove(); });
-  // 品種チップは、・カンマを改行に変換して縦並びで表示
   const displayText = (chip.id === 'v3-chip-grape')
     ? text.replace(/\s*[、,]\s*/g, '\n')
     : text;
@@ -842,6 +842,7 @@ function getCountryFlag(text) {
 function setCountryChipFilled(chip, text) {
   if (!chip) return;
   const cleanText = text.replace(/^([\uD83C][\uDDE0-\uDDFF][\uD83C][\uDDE0-\uDDFF]\s*)+/, '').trim() || text;
+  chip.dataset.wnValue = cleanText;
   // 既存の中身を全消し（SVG含む・絵文字に差し替えるため）
   [...chip.childNodes].forEach(n => n.remove());
   const flag = getCountryFlag(cleanText);
@@ -1096,7 +1097,7 @@ function collectCurrentEntry() {
   function getChipText(id, placeholder) {
     const el = document.getElementById(id);
     if (!el) return '';
-    const t = el.innerText.trim();
+    const t = (el.dataset.wnValue !== undefined ? el.dataset.wnValue : el.innerText).trim();
     return (t === placeholder || t === '') ? '' : t;
   }
 
