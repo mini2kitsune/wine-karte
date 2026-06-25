@@ -1867,8 +1867,14 @@ async function initWineNotesAuth() {
   if (session) {
     currentUser = session.user;
     document.getElementById('wn-login-overlay').style.display = 'none';
-    // バックグラウンドで Supabase データを取得して更新（現在の編集中ビューは変えない）
-    loadAllFromSupabase();
+    // ローカルにデータがない場合のみSupabaseから取得（クロスデバイス初回起動）
+    const localArr = loadData();
+    if (localArr.length === 0) {
+      loadAllFromSupabase().then(() => {
+        const arr = loadData();
+        if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
+      });
+    }
   } else {
     // セッションなし → フォームを表示
     document.getElementById('wn-login-loading').style.display = 'none';
