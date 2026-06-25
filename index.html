@@ -1884,15 +1884,22 @@ async function initWineNotesAuth() {
   // 今後の認証状態変化を監視
   sbClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) {
+      const isNewLogin = !currentUser; // トークン更新との区別
       currentUser = session.user;
       document.getElementById('wn-login-overlay').style.display = 'none';
-      await loadAllFromSupabase();
-      const arr = loadData();
-      if (arr.length > 0) {
-        currentId = arr[0].id;
-        fillEntry(arr[0]);
-      } else {
-        showNew();
+      if (isNewLogin) {
+        // 新規ログイン時のみナビゲート（トークン更新時は入力中画面を維持）
+        const localArr = loadData();
+        if (localArr.length === 0) {
+          await loadAllFromSupabase();
+        }
+        const arr = loadData();
+        if (arr.length > 0) {
+          currentId = arr[0].id;
+          fillEntry(arr[0]);
+        } else {
+          showNew();
+        }
       }
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
