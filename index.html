@@ -1424,6 +1424,7 @@ function showEntry(id) {
   reinitAll();
   const e = loadData().find(x => x.id === id);
   if (e) fillEntry(e);
+  enableDatePicker();
   if (typeof window.fitPhone === 'function') { window._nh = 0; window.fitPhone(); }
 }
 
