@@ -956,19 +956,18 @@ function enableDatePicker() {
   dateDd.removeAttribute('contenteditable');
   dateDd.style.cursor = 'pointer';
   dateDd.addEventListener('click', function() {
+    document.querySelectorAll('input[data-wn-date]').forEach(el => el.remove());
     const inp = document.createElement('input');
     inp.type = 'date';
+    inp.dataset.wnDate = '1';
     inp.style.cssText = 'position:fixed;top:-200px;left:-200px;opacity:0.01;width:1px;height:1px;';
     document.body.appendChild(inp);
     inp.addEventListener('change', function() {
-      if (!inp.value) { document.body.removeChild(inp); return; }
+      if (!inp.value) { inp.remove(); return; }
       const d = new Date(inp.value + 'T12:00:00');
       const days = ['日','月','火','水','木','金','土'];
       dateDd.innerText = `${d.getFullYear()} / ${String(d.getMonth()+1).padStart(2,'0')} / ${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
-      document.body.removeChild(inp);
-    });
-    inp.addEventListener('blur', function() {
-      setTimeout(() => { if (document.body.contains(inp)) document.body.removeChild(inp); }, 500);
+      inp.remove();
     });
     inp.focus();
     inp.click();
