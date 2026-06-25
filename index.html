@@ -155,19 +155,19 @@ tailwind.config = {
         </div>
         <!-- Meta -->
         <dl style="display:flex;flex-direction:column;gap:13px;">
-          <div class="flex items-center" style="gap:16px;font-size:26px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">生産者</dt><dd class="text-ink font-medium whitespace-nowrap">Château Margaux</dd></div>
-          <div class="flex items-center" style="gap:16px;font-size:26px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium whitespace-nowrap">2018</dd></div>
-          <div class="flex items-center" style="gap:16px;font-size:26px;">
+          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">生産者</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">Château Margaux</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">2018</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:16px;">
             <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>飲んだ日</dt>
-            <dd class="text-ink font-medium whitespace-nowrap">2024 / 05 / 20 (月) 20:30</dd>
+            <dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">2024 / 05 / 20 (月) 20:30</dd>
           </div>
-          <div class="flex items-center" style="gap:16px;font-size:26px;">
+          <div class="flex items-center" style="gap:16px;font-size:16px;">
             <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 12.2V4a1 1 0 0 1 1-1h8.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8z"></path><circle cx="8" cy="8" r="1.4"></circle></svg>購入価格</dt>
-            <dd class="text-ink font-medium whitespace-nowrap">¥45,000</dd>
+            <dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">¥45,000</dd>
           </div>
-          <div class="flex items-center" style="gap:16px;font-size:26px;">
+          <div class="flex items-center" style="gap:16px;font-size:16px;">
             <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle><path d="M2 3h3l2.4 12.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L22 7H6"></path></svg>購入場所</dt>
-            <dd class="text-ink font-medium whitespace-nowrap">○○ワインショップ</dd>
+            <dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">○○ワインショップ</dd>
           </div>
         </dl>
       </div>
@@ -180,31 +180,31 @@ tailwind.config = {
       <div class="card flex-1 flex items-center" style="border-radius:36px;padding:16px 18px;gap:8px;min-width:0;overflow:hidden;">
         <!-- Rating -->
         <div class="flex flex-col items-center" style="flex:1;min-width:0;">
-          <div class="text-ink-mute whitespace-nowrap" style="font-size:22px;margin-bottom:10px;">総合評価</div>
+          <div class="text-ink-mute whitespace-nowrap" style="font-size:14px;margin-bottom:6px;">総合評価</div>
           <div class="flex" style="gap:3px;" id="stars"></div>
-          <div class="font-pf text-[#3a1118] font-semibold" style="font-size:34px;margin-top:8px;">
-            4.5 <span class="text-ink-mute font-normal" style="font-size:22px;">/ 5.0</span>
+          <div class="font-pf text-[#3a1118] font-semibold" style="font-size:24px;margin-top:6px;">
+            4.5 <span class="text-ink-mute font-normal" style="font-size:14px;">/ 5.0</span>
           </div>
         </div>
         <!-- Divider -->
         <div class="self-stretch border-l border-dashed border-[#D8C9A8]" style="margin:8px;flex-shrink:0;"></div>
         <!-- Likert -->
         <div class="flex flex-col items-center" style="flex:2;min-width:0;">
-          <div class="text-ink-mute whitespace-nowrap" style="font-size:22px;margin-bottom:10px;">また飲みたい？</div>
+          <div class="text-ink-mute whitespace-nowrap" style="font-size:14px;margin-bottom:6px;">また飲みたい？</div>
           <div class="flex flex-nowrap" style="gap:8px;" id="likert">
-            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-bordeaux border-bordeaux text-white" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="1">
-              <span class="rounded-full flex items-center justify-center bg-white/15 border border-transparent" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5.5 5.7 5.5c1.9 0 3.2 1.1 4.3 2.6 1.1-1.5 2.4-2.6 4.3-2.6 3.1 0 4.8 3.1 3.3 6.4C19.5 16.4 12 21 12 21z"></path></svg></span>はい</button>
-            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="0">
-              <span class="rounded-full flex items-center justify-center border border-hair" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><line x1="8" y1="14.5" x2="16" y2="14.5"></line><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>どちらでも</button>
-            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="0">
-              <span class="rounded-full flex items-center justify-center border border-hair" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><path d="M8 16c1-1.6 2.4-2.4 4-2.4S15 14.4 16 16"></path><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>いいえ</button>
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-bordeaux border-bordeaux text-white" style="gap:8px;padding:6px 10px 6px 6px;font-size:14px;" data-on="1">
+              <span class="rounded-full flex items-center justify-center bg-white/15 border border-transparent" style="width:22px;height:22px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5.5 5.7 5.5c1.9 0 3.2 1.1 4.3 2.6 1.1-1.5 2.4-2.6 4.3-2.6 3.1 0 4.8 3.1 3.3 6.4C19.5 16.4 12 21 12 21z"></path></svg></span>はい</button>
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:6px 10px 6px 6px;font-size:14px;" data-on="0">
+              <span class="rounded-full flex items-center justify-center border border-hair" style="width:22px;height:22px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><line x1="8" y1="14.5" x2="16" y2="14.5"></line><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>どちらでも</button>
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:6px 10px 6px 6px;font-size:14px;" data-on="0">
+              <span class="rounded-full flex items-center justify-center border border-hair" style="width:22px;height:22px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><path d="M8 16c1-1.6 2.4-2.4 4-2.4S15 14.4 16 16"></path><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>いいえ</button>
           </div>
         </div>
       </div>
       <!-- Fav bookmark -->
-      <button id="favTab" class="fav-bg fav-notch shrink-0 flex flex-col items-center justify-start text-white" style="width:130px;height:165px;border-radius:14px 14px 0 0;padding-top:22px;gap:14px;box-shadow:0 8px 20px rgba(120,90,20,.3);">
-        <span style="font-size:46px;line-height:1;">♥</span>
-        <span style="font-size:17px;letter-spacing:1px;writing-mode:horizontal-tb;text-align:center;line-height:1;white-space:nowrap;">お気に入り</span>
+      <button id="favTab" class="fav-bg fav-notch shrink-0 flex flex-col items-center justify-start text-white" style="width:88px;height:120px;border-radius:14px 14px 0 0;padding-top:12px;gap:8px;box-shadow:0 8px 20px rgba(120,90,20,.3);">
+        <span style="font-size:30px;line-height:1;">♥</span>
+        <span style="font-size:13px;letter-spacing:1px;writing-mode:horizontal-tb;text-align:center;line-height:1;white-space:nowrap;">お気に入り</span>
       </button>
     </div>
   </div>
@@ -214,8 +214,8 @@ tailwind.config = {
     <div class="card" style="border-radius:22px;padding:0 4px;">
 
       <div class="flex items-end" style="gap:10px;padding:6px 10px 10px;">
-        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
-          <img src="assets/seal_look.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;width:200px;">
+          <img src="assets/seal_look.png" alt="" class="seal-sh" style="width:90px;height:90px;object-fit:contain;flex-shrink:0;">
           <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">見た目</div>
         </div>
         <div class="flex-1 min-w-0">
@@ -226,8 +226,8 @@ tailwind.config = {
       </div>
 
       <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
-        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
-          <img src="assets/seal_aroma.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;width:200px;">
+          <img src="assets/seal_aroma.png" alt="" class="seal-sh" style="width:90px;height:90px;object-fit:contain;flex-shrink:0;">
           <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">香り</div>
         </div>
         <div class="flex-1 min-w-0">
@@ -238,8 +238,8 @@ tailwind.config = {
       </div>
 
       <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
-        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
-          <img src="assets/seal_taste.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;width:200px;">
+          <img src="assets/seal_taste.png" alt="" class="seal-sh" style="width:90px;height:90px;object-fit:contain;flex-shrink:0;">
           <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">味わい</div>
         </div>
         <div class="flex-1 min-w-0">
@@ -250,8 +250,8 @@ tailwind.config = {
       </div>
 
       <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
-        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
-          <img src="assets/seal_memo.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;width:200px;">
+          <img src="assets/seal_memo.png" alt="" class="seal-sh" style="width:90px;height:90px;object-fit:contain;flex-shrink:0;">
           <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">一言メモ</div>
         </div>
         <div class="flex-1 min-w-0">
@@ -269,22 +269,22 @@ tailwind.config = {
       <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
         <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none" stroke="#A9842A" stroke-width="1.6"><rect x="8" y="2.5" width="8" height="4" rx="1.2"></rect><rect x="5" y="4.5" width="14" height="18" rx="2.4"></rect><line x1="8.5" y1="11" x2="15.5" y2="11"></line><line x1="8.5" y1="15" x2="13.5" y2="15"></line></svg></span>
         <span class="flex flex-col" style="gap:4px;">
-          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">テイスティングコメントをコピー</span>
-          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">カルテの内容をコピー</span>
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;">テイスティングコメントをコピー</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;">カルテの内容をコピー</span>
         </span>
       </button>
       <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
         <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#C13584" stroke-width="1.8"></rect><circle cx="12" cy="12" r="4.2" stroke="#C13584" stroke-width="1.8"></circle><circle cx="17.3" cy="6.7" r="1.2" fill="#C13584"></circle></svg></span>
         <span class="flex flex-col" style="gap:4px;">
-          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">Instagram投稿用に整形</span>
-          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">見やすく・映える文章に変換</span>
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;">Instagram投稿用に整形</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;">見やすく・映える文章に変換</span>
         </span>
       </button>
       <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
         <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none" stroke="#7A1322" stroke-width="1.7"><path d="M12 16V4"></path><path d="M8 8l4-4 4 4"></path><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg></span>
         <span class="flex flex-col" style="gap:4px;">
-          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">シェアする</span>
-          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">画像として共有</span>
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;">シェアする</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;">画像として共有</span>
         </span>
       </button>
     </div>
@@ -841,16 +841,17 @@ function getCountryFlag(text) {
 // 国旗付きでチップを埋める
 function setCountryChipFilled(chip, text) {
   if (!chip) return;
+  const cleanText = text.replace(/^([\uD83C][\uDDE0-\uDDFF][\uD83C][\uDDE0-\uDDFF]\s*)+/, '').trim() || text;
   // 既存の中身を全消し（SVG含む・絵文字に差し替えるため）
   [...chip.childNodes].forEach(n => n.remove());
-  const flag = getCountryFlag(text);
+  const flag = getCountryFlag(cleanText);
   if (flag) {
     const flagSpan = document.createElement('span');
     flagSpan.style.cssText = 'font-size:26px;flex-shrink:0;margin-right:2px;line-height:1;';
     flagSpan.textContent = flag;
     chip.appendChild(flagSpan);
   }
-  chip.appendChild(document.createTextNode(text));
+  chip.appendChild(document.createTextNode(cleanText));
   chip.style.borderStyle = '';
   chip.style.borderColor = '';
   chip.style.color = '';
