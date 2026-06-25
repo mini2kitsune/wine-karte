@@ -948,14 +948,6 @@ function enableInlineEdit() {
     el.addEventListener('blur',  () => { el.style.boxShadow = ''; el.style.borderRadius = ''; });
   });
 
-  // v3-meta-vintageの入力をh1内のspanにリアルタイム同期（表示用）
-  const metaVintage = document.getElementById('v3-meta-vintage');
-  if (metaVintage) {
-    metaVintage.addEventListener('input', () => {
-      const spanEl = document.getElementById('v3-wine-vintage-span');
-      if (spanEl) spanEl.textContent = metaVintage.innerText.trim();
-    });
-  }
 }
 
 // ── Date Picker ───────────────────────────────────────────────────────────────
@@ -992,11 +984,17 @@ function enablePhotoUpload() {
   const photoBtn = document.querySelector('.card .relative button');
   const photoImg = document.getElementById('v3-photo');
   if (!photoBtn || !photoImg) return;
-  const fileInp = document.createElement('input');
-  fileInp.type = 'file';
-  fileInp.accept = 'image/*';
-  fileInp.style.display = 'none';
-  document.body.appendChild(fileInp);
+  // 既存inputを再利用（reinitAllのたびに蓄積しないよう）
+  let fileInp = document.getElementById('wn-photo-inp');
+  if (!fileInp) {
+    fileInp = document.createElement('input');
+    fileInp.id = 'wn-photo-inp';
+    fileInp.type = 'file';
+    fileInp.accept = 'image/*';
+    fileInp.style.display = 'none';
+    document.body.appendChild(fileInp);
+  }
+  fileInp.onchange = null; // 旧リスナーをリセット
   photoBtn.addEventListener('click', () => fileInp.click());
 
   // 写真プレースホルダ overlay を挿入
@@ -1029,7 +1027,7 @@ function enablePhotoUpload() {
     updatePhotoPlaceholder();
   }
 
-  fileInp.addEventListener('change', async () => {
+  fileInp.onchange = async () => {
     const file = fileInp.files[0];
     if (!file) return;
     try {
@@ -1043,7 +1041,7 @@ function enablePhotoUpload() {
       // 同じファイルを連続選択できるようリセット
       fileInp.value = '';
     }
-  });
+  };
 }
 
 // ── Star Rating ───────────────────────────────────────────────────────────────
@@ -1111,16 +1109,21 @@ function collectCurrentEntry() {
   }
 
   const h1El = document.getElementById('v3-wine-title');
+  const spanEl = document.getElementById('v3-wine-vintage-span');
   let wineName = '', vintage = '';
   if (h1El) {
-    // ユーザーが編集するのはv3-meta-vintageなので、そちらを正とする
-    const metaVintageEl = document.getElementById('v3-meta-vintage');
-    const spanEl = document.getElementById('v3-wine-vintage-span');
-    const metaVal = metaVintageEl ? metaVintageEl.innerText.trim() : '';
-    vintage = (metaVal && metaVal !== '—') ? metaVal : (spanEl ? spanEl.innerText.trim() : '');
-    const spanText = spanEl ? spanEl.innerText.trim() : '';
-    wineName = h1El.innerText.replace(spanText, '').trim();
+    // ワイン名: h1の子ノードをたどりvintagespanを除外して取得（replaceは名称内の文字を誤削除するため使わない）
+    const parts = [];
+    h1El.childNodes.forEach(node => {
+      if (node === spanEl) return;
+      parts.push(node.textContent || '');
+    });
+    wineName = parts.join('').trim();
   }
+  // ヴィンテージ: ユーザーが編集するv3-meta-vintageを正とする
+  const metaVintageEl = document.getElementById('v3-meta-vintage');
+  const metaVal = metaVintageEl ? metaVintageEl.innerText.trim() : '';
+  vintage = (metaVal && metaVal !== '—') ? metaVal : (spanEl ? spanEl.innerText.trim() : '');
 
   const starsDiv = document.getElementById('stars');
   const rating = starsDiv ? parseFloat(starsDiv.dataset.rating || '4.5') : 4.5;
@@ -1166,8 +1169,10 @@ function fillEntry(entry) {
   if (h1El) {
     const spanEl = document.getElementById('v3-wine-vintage-span');
     if (spanEl) {
-      const tn = h1El.firstChild;
-      if (tn && tn.nodeType === 3) tn.textContent = (entry.wineName || '') + ' ';
+      // h1内のvintagespan以外のノードをすべて削除してからワイン名テキストノードを挿入
+      // （iOSがfirstChildをspanで包む場合に備えてfirstChildチェックに依存しない）
+      [...h1El.childNodes].forEach(n => { if (n !== spanEl) n.remove(); });
+      h1El.insertBefore(document.createTextNode((entry.wineName || '') + ' '), spanEl);
       spanEl.textContent = entry.vintage || '';
     }
   }
@@ -1211,7 +1216,7 @@ function fillEntry(entry) {
     else setChipEmpty(chipGrape, '品種を入力');
   }
 
-  renderStars(entry.rating || 4.5);
+  renderStars(entry.rating != null ? entry.rating : 4.5);
 
   document.querySelectorAll('#likert .opt').forEach(btn => {
     const isActive = btn.innerText.trim() === (entry.wantAgain || 'はい');
@@ -1246,7 +1251,7 @@ function enableSaveButton() {
     if (currentId && currentId !== NEW_ENTRY_ID) {
       const idx = arr.findIndex(e => e.id === currentId);
       if (idx >= 0) {
-        arr[idx] = { ...arr[idx], ...entry, id: currentId };
+        arr[idx] = { ...arr[idx], ...entry, id: currentId, createdAt: arr[idx].createdAt };
       } else {
         entry.id = currentId;
         arr.unshift(entry);
