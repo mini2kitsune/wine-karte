@@ -1875,38 +1875,32 @@ async function initWineNotesAuth() {
   if (!window.supabase) { console.warn('[WN] supabase-js not loaded'); return; }
   sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Supabase v2: onAuthStateChange登録時にINITIAL_SESSIONが即時発火する。
-  // getSession()と併用すると競合するため、INITIAL_SESSIONで一元管理する。
-  sbClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'INITIAL_SESSION') {
-      // ページロード時の既存セッション確認（getSession()の代替）
-      if (session) {
-        currentUser = session.user;
-        document.getElementById('wn-login-overlay').style.display = 'none';
-        // ローカルにデータがない場合のみSupabaseから取得（新デバイス初回）
-        const localArr = loadData();
-        if (localArr.length === 0) {
-          await loadAllFromSupabase();
-          const arr = loadData();
-          if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
-        }
-      } else {
-        // セッションなし → ログインフォームを表示
-        document.getElementById('wn-login-loading').style.display = 'none';
-        document.getElementById('wn-login-form').style.display = 'block';
-      }
-    } else if (event === 'SIGNED_IN' && session) {
-      // ログインボタン押下による新規サインイン時のみここに来る
+  // ページロード時のセッション確認（一度だけ）
+  try {
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (session) {
       currentUser = session.user;
       document.getElementById('wn-login-overlay').style.display = 'none';
+      // 新デバイス初回のみSupabaseから取得（ナビゲートもここだけ）
       const localArr = loadData();
-      if (localArr.length === 0) await loadAllFromSupabase();
-      const arr = loadData();
-      if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
-      else showNew();
-    } else if (event === 'TOKEN_REFRESHED' && session) {
-      // トークン自動更新：currentUserを更新するだけ（ナビゲート禁止）
+      if (localArr.length === 0) {
+        await loadAllFromSupabase();
+        const arr = loadData();
+        if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
+      }
+    } else {
+      document.getElementById('wn-login-loading').style.display = 'none';
+      document.getElementById('wn-login-form').style.display = 'block';
+    }
+  } catch(e) {
+    console.warn('[WN] getSession error', e);
+  }
+
+  // 認証状態変化の監視（currentUser更新とオーバーレイ制御のみ・ナビゲート禁止）
+  sbClient.auth.onAuthStateChange((event, session) => {
+    if (session) {
       currentUser = session.user;
+      document.getElementById('wn-login-overlay').style.display = 'none';
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
       document.getElementById('wn-login-loading').style.display = 'block';
@@ -1973,9 +1967,16 @@ async function doWNAuth() {
       btn.textContent = '新規登録';
       return;
     }
-    const { error } = await sbClient.auth.signInWithPassword({ email, password });
+    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    // onAuthStateChange (SIGNED_IN) でオーバーレイを閉じる
+    // ログイン成功 → 直接ナビゲート（onAuthStateChangeに依存しない）
+    currentUser = data.user;
+    document.getElementById('wn-login-overlay').style.display = 'none';
+    const localArr = loadData();
+    if (localArr.length === 0) await loadAllFromSupabase();
+    const arr = loadData();
+    if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
+    else showNew();
   } catch(e) {
     let msg = e.message || (wnAuthMode === 'signup' ? '登録に失敗しました' : 'ログインに失敗しました');
     if (msg === 'Invalid login credentials') msg = 'メールかパスワードが正しくありません';
