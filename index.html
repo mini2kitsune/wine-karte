@@ -460,6 +460,110 @@ window.addEventListener('resize',fitPhone);
   #v3-taste-look:focus, #v3-taste-aroma:focus, #v3-taste-flavor:focus, #v3-taste-memo:focus {
     font-family: "Noto Serif JP", serif !important;
   }
+  /* ⚡ Quick Entry FAB */
+  #fab-quick {
+    display: none;
+    position: fixed;
+    right: 18px;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    width: 52px; height: 52px;
+    background: #5B0E1A;
+    border: none; border-radius: 50%;
+    color: #FAF6EF; font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(91,14,26,.45);
+    z-index: 50;
+    align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (max-width: 900px) { #fab-quick { display: flex; } }
+  /* Bottom sheet (shared) */
+  .wine-sheet {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(30,10,15,.78);
+    display: none; align-items: flex-end;
+  }
+  .wine-sheet.open { display: flex; }
+  .wine-sheet-inner {
+    background: #FAF6EF;
+    border-radius: 28px 28px 0 0;
+    width: 100%; max-height: 85vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 -8px 40px rgba(60,20,20,.22);
+  }
+  .ws-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px 12px; border-bottom: 1px solid #E7DECB; flex-shrink: 0;
+  }
+  .ws-title { font-size: 17px; font-weight: 700; color: #241015; }
+  .ws-close {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #E7DECB; border: none; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    color: #6B5B4B;
+  }
+  .ws-body { overflow-y: auto; padding: 16px 20px calc(20px + env(safe-area-inset-bottom)); flex: 1; }
+  /* ④ Quick Entry */
+  .qe-label { font-size: 12px; color: #9A8C7C; font-weight: 700; letter-spacing: .4px; margin-bottom: 6px; }
+  .qe-input {
+    width: 100%; font-family: "Noto Serif JP", serif; font-size: 17px;
+    padding: 12px 14px; border: 1.5px solid #E7DECB; border-radius: 12px;
+    background: #fff; color: #241015; outline: none; box-sizing: border-box; margin-bottom: 14px;
+  }
+  .qe-input:focus { border-color: #D4AF37; }
+  .qe-type-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+  .qe-type-btn {
+    padding: 7px 14px; border: 1.5px solid #E7DECB; border-radius: 20px;
+    font-size: 13px; font-family: "Noto Serif JP", serif; background: #fff; color: #6B5B4B; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .qe-type-btn.sel { background: #5B0E1A; border-color: #5B0E1A; color: #FAF6EF; }
+  #qe-stars { display: flex; gap: 4px; margin-bottom: 14px; cursor: pointer; }
+  .qe-memo {
+    width: 100%; font-family: "Noto Serif JP", serif; font-size: 15px;
+    padding: 11px 14px; border: 1.5px solid #E7DECB; border-radius: 12px;
+    background: #fff; color: #241015; outline: none; resize: none; height: 72px;
+    box-sizing: border-box; margin-bottom: 18px;
+  }
+  .qe-memo:focus { border-color: #D4AF37; }
+  .qe-save {
+    width: 100%; padding: 14px; background: #5B0E1A; color: #FAF6EF;
+    border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+    font-family: "Noto Serif JP", serif; cursor: pointer;
+  }
+  /* ① Exam Vocab */
+  .ev-tabs {
+    display: flex; border-bottom: 1px solid #E7DECB; flex-shrink: 0; overflow-x: auto;
+    padding: 0 16px;
+  }
+  .ev-tab {
+    padding: 10px 16px; font-size: 14px; font-weight: 600; color: #9A8C7C;
+    border-bottom: 2.5px solid transparent; cursor: pointer; white-space: nowrap;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: "Noto Serif JP", serif; -webkit-tap-highlight-color: transparent;
+  }
+  .ev-tab.active { color: #5B0E1A; border-bottom-color: #5B0E1A; }
+  .ev-panel { display: none; }
+  .ev-panel.active { display: block; }
+  .ev-cat { margin-bottom: 14px; }
+  .ev-cat-label { font-size: 11px; color: #A9842A; font-weight: 700; letter-spacing: .6px; margin-bottom: 6px; }
+  .ev-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .ev-chip {
+    padding: 6px 12px; background: #fff; border: 1.5px solid #D4AF37;
+    border-radius: 16px; font-size: 13px; color: #5B0E1A; cursor: pointer;
+    font-family: "Noto Serif JP", serif; -webkit-tap-highlight-color: transparent;
+  }
+  .ev-preview {
+    margin-top: 12px; padding: 10px 12px; background: rgba(91,14,26,.06);
+    border-radius: 10px; font-size: 13px; color: #5B0E1A; line-height: 1.5;
+    display: none;
+  }
+  .ev-done-btn {
+    width: 100%; margin-top: 14px; padding: 12px;
+    background: #E7DECB; color: #5B0E1A;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: "Noto Serif JP", serif; cursor: pointer;
+  }
 </style>
 
 <script>
@@ -1256,6 +1360,7 @@ function reinitAll() {
   enableSaveButton();
   enableActionButtons();
   enableFooterNav();
+  enableTastingEditButtons();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1275,8 +1380,299 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// ══════════════════════════════════════════════════════
+// ④ クイック入力モード
+// ══════════════════════════════════════════════════════
+let qeRating = 4;
+
+function renderQEStars(r) {
+  const el = document.getElementById('qe-stars');
+  if (!el) return;
+  const path = '<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z"/>';
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    html += `<svg viewBox="0 0 24 24" style="width:36px;height:36px;" fill="${i <= r ? '#D4AF37' : '#E7DECB'}">${path}</svg>`;
+  }
+  el.innerHTML = html;
+  el.dataset.rating = r;
+}
+window.renderQEStars = renderQEStars;
+
+function showQuickEntry() {
+  qeRating = 4;
+  renderQEStars(4);
+  const nameEl = document.getElementById('qe-name');
+  const memoEl = document.getElementById('qe-memo');
+  if (nameEl) nameEl.value = '';
+  if (memoEl) memoEl.value = '';
+  document.querySelectorAll('#qe-types .qe-type-btn').forEach((b, i) => b.classList.toggle('sel', i === 0));
+  document.getElementById('quick-modal').classList.add('open');
+  setTimeout(() => { if (nameEl) nameEl.focus(); }, 150);
+}
+window.showQuickEntry = showQuickEntry;
+
+function closeQuickEntry() {
+  const m = document.getElementById('quick-modal');
+  if (m) m.classList.remove('open');
+}
+window.closeQuickEntry = closeQuickEntry;
+
+function saveQuickEntry() {
+  const nameEl = document.getElementById('qe-name');
+  const memoEl = document.getElementById('qe-memo');
+  const name = (nameEl ? nameEl.value : '').trim();
+  if (!name) {
+    if (nameEl) {
+      nameEl.focus();
+      nameEl.style.borderColor = '#ef5350';
+      setTimeout(() => { nameEl.style.borderColor = ''; }, 1500);
+    }
+    return;
+  }
+  const selType = document.querySelector('#qe-types .qe-type-btn.sel');
+  const wineType = selType ? selType.dataset.type : '赤ワイン';
+  const memo = memoEl ? memoEl.value.trim() : '';
+
+  const now = new Date();
+  const days = ['日','月','火','水','木','金','土'];
+  const drinkDate = `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
+
+  const entry = {
+    id: Date.now().toString(),
+    createdAt: Date.now(),
+    wineName: name, vintage: '', producer: '', country: '', grape: '',
+    wineType, drinkDate, price: '', shop: '',
+    tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: memo,
+    rating: qeRating, wantAgain: 'はい', isFav: false, photo: '', aiComment: '',
+  };
+
+  const arr = loadData();
+  arr.unshift(entry);
+  const ok = saveData(arr);
+  closeQuickEntry();
+  if (ok) {
+    showEntry(entry.id);
+    showToast('✓ 保存しました');
+  }
+}
+window.saveQuickEntry = saveQuickEntry;
+
+// ══════════════════════════════════════════════════════
+// ① 試験対策テイスティングモード
+// ══════════════════════════════════════════════════════
+let examCurrentField = 'v3-taste-look';
+
+function openExamModal(fieldId) {
+  examCurrentField = fieldId;
+  const tabMap = { 'v3-taste-look': 'look', 'v3-taste-aroma': 'aroma', 'v3-taste-flavor': 'flavor' };
+  switchExamTab(tabMap[fieldId] || 'look');
+  updateExamPreview();
+  const m = document.getElementById('exam-modal');
+  if (m) m.classList.add('open');
+}
+window.openExamModal = openExamModal;
+
+function closeExamModal() {
+  const m = document.getElementById('exam-modal');
+  if (m) m.classList.remove('open');
+}
+window.closeExamModal = closeExamModal;
+
+function switchExamTab(tab) {
+  const tabs = ['look', 'aroma', 'flavor'];
+  document.querySelectorAll('.ev-tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.ev-panel').forEach(p => p.classList.toggle('active', p.id === 'ev-panel-' + tab));
+  const fieldMap = { look: 'v3-taste-look', aroma: 'v3-taste-aroma', flavor: 'v3-taste-flavor' };
+  if (fieldMap[tab]) examCurrentField = fieldMap[tab];
+  updateExamPreview();
+}
+window.switchExamTab = switchExamTab;
+
+function updateExamPreview() {
+  const el = document.getElementById(examCurrentField);
+  const preview = document.getElementById('ev-preview');
+  if (!preview) return;
+  const text = el ? el.innerText.trim() : '';
+  if (text) {
+    preview.style.display = 'block';
+    preview.innerHTML = `<span style="color:#9A8C7C;font-size:11px;display:block;margin-bottom:4px;">現在の入力内容:</span>${text}`;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function appendExamChip(text) {
+  const el = document.getElementById(examCurrentField);
+  if (!el) return;
+  const cur = el.innerText.trim();
+  el.innerText = cur ? cur + '、' + text : text;
+  updateExamPreview();
+}
+window.appendExamChip = appendExamChip;
+
+function enableTastingEditButtons() {
+  const tasteCard = document.querySelector('.card[style*="border-radius:22px"]');
+  if (!tasteCard) return;
+  const rows = tasteCard.querySelectorAll('.flex.items-end');
+  const fieldMap = ['v3-taste-look', 'v3-taste-aroma', 'v3-taste-flavor', null];
+  rows.forEach((row, i) => {
+    if (!fieldMap[i]) return;
+    const btn = row.querySelector('button');
+    if (!btn) return;
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    const field = fieldMap[i];
+    newBtn.addEventListener('click', () => openExamModal(field));
+    newBtn.title = '試験対策ボキャブラリを使う';
+  });
+}
+
+// Modal init (once, outside IIFE's main DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', function() {
+  // Quick Entry stars
+  const qeStarsEl = document.getElementById('qe-stars');
+  if (qeStarsEl) {
+    renderQEStars(4);
+    qeStarsEl.addEventListener('click', (e) => {
+      const rect = qeStarsEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      qeRating = Math.max(1, Math.min(5, Math.ceil(x / (rect.width / 5))));
+      renderQEStars(qeRating);
+    });
+  }
+  // Quick Entry type buttons
+  document.querySelectorAll('#qe-types .qe-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#qe-types .qe-type-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+    });
+  });
+  // Exam modal chip click delegation
+  const examBody = document.querySelector('#exam-modal .ws-body');
+  if (examBody) {
+    examBody.addEventListener('click', (e) => {
+      const chip = e.target.closest('.ev-chip');
+      if (!chip) return;
+      appendExamChip(chip.textContent.trim());
+      chip.style.background = '#5B0E1A';
+      chip.style.color = '#FAF6EF';
+      chip.style.borderColor = '#5B0E1A';
+      setTimeout(() => { chip.style.background = ''; chip.style.color = ''; chip.style.borderColor = ''; }, 280);
+    });
+  }
+});
+
 })();
 </script>
+<!-- ⚡ クイック入力 FAB (mobile only) -->
+<button id="fab-quick" onclick="window.showQuickEntry()" aria-label="クイック入力">⚡</button>
+
+<!-- ④ クイック入力モーダル -->
+<div id="quick-modal" class="wine-sheet" onclick="if(event.target===this)window.closeQuickEntry()">
+  <div class="wine-sheet-inner">
+    <div class="ws-header">
+      <div class="ws-title">⚡ クイック入力</div>
+      <button class="ws-close" onclick="window.closeQuickEntry()">✕</button>
+    </div>
+    <div class="ws-body">
+      <div class="qe-label">ワイン名</div>
+      <input id="qe-name" class="qe-input" type="text" placeholder="例: シャトー・マルゴー 2018" autocomplete="off">
+      <div class="qe-label">タイプ</div>
+      <div class="qe-type-row" id="qe-types">
+        <button class="qe-type-btn sel" data-type="赤ワイン">🍷 赤</button>
+        <button class="qe-type-btn" data-type="白ワイン">🥂 白</button>
+        <button class="qe-type-btn" data-type="ロゼ">🌸 ロゼ</button>
+        <button class="qe-type-btn" data-type="スパークリング">✨ 泡</button>
+        <button class="qe-type-btn" data-type="甘口">🍯 甘口</button>
+      </div>
+      <div class="qe-label">評価</div>
+      <div id="qe-stars"></div>
+      <div class="qe-label">一言メモ</div>
+      <textarea id="qe-memo" class="qe-memo" placeholder="感想・ペアリングなど"></textarea>
+      <button class="qe-save" onclick="window.saveQuickEntry()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ① 試験対策テイスティングモーダル -->
+<div id="exam-modal" class="wine-sheet" onclick="if(event.target===this)window.closeExamModal()">
+  <div class="wine-sheet-inner">
+    <div class="ws-header">
+      <div class="ws-title">📚 試験対策テイスティング</div>
+      <button class="ws-close" onclick="window.closeExamModal()">✕</button>
+    </div>
+    <div class="ev-tabs">
+      <button class="ev-tab active" onclick="window.switchExamTab('look')">👁 見た目</button>
+      <button class="ev-tab" onclick="window.switchExamTab('aroma')">🌸 香り</button>
+      <button class="ev-tab" onclick="window.switchExamTab('flavor')">✨ 味わい</button>
+    </div>
+    <div class="ws-body">
+      <div id="ev-panel-look" class="ev-panel active">
+        <div class="ev-cat"><div class="ev-cat-label">色調（赤系）</div><div class="ev-chips">
+          <button class="ev-chip">紫がかった</button><button class="ev-chip">ルビー</button><button class="ev-chip">ガーネット</button><button class="ev-chip">レンガ</button><button class="ev-chip">オレンジがかった</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">色調（白系）</div><div class="ev-chips">
+          <button class="ev-chip">麦わら色</button><button class="ev-chip">レモン</button><button class="ev-chip">ゴールド</button><button class="ev-chip">琥珀</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">濃淡</div><div class="ev-chips">
+          <button class="ev-chip">濃い</button><button class="ev-chip">やや濃い</button><button class="ev-chip">中程度</button><button class="ev-chip">やや淡い</button><button class="ev-chip">淡い</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">透明感・輝き</div><div class="ev-chips">
+          <button class="ev-chip">輝きがある</button><button class="ev-chip">クリア</button><button class="ev-chip">わずかにくもり</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">粘性</div><div class="ev-chips">
+          <button class="ev-chip">粘性 高い</button><button class="ev-chip">粘性 中程度</button><button class="ev-chip">粘性 低い</button>
+        </div></div>
+      </div>
+      <div id="ev-panel-aroma" class="ev-panel">
+        <div class="ev-cat"><div class="ev-cat-label">強さ</div><div class="ev-chips">
+          <button class="ev-chip">香り 強い</button><button class="ev-chip">香り 中程度</button><button class="ev-chip">香り 弱い</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">赤・黒果実</div><div class="ev-chips">
+          <button class="ev-chip">ラズベリー</button><button class="ev-chip">イチゴ</button><button class="ev-chip">チェリー</button><button class="ev-chip">カシス</button><button class="ev-chip">プラム</button><button class="ev-chip">ブルーベリー</button><button class="ev-chip">ブラックベリー</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">白・黄果実・柑橘</div><div class="ev-chips">
+          <button class="ev-chip">リンゴ</button><button class="ev-chip">洋梨</button><button class="ev-chip">桃</button><button class="ev-chip">アプリコット</button><button class="ev-chip">レモン</button><button class="ev-chip">グレープフルーツ</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">花・植物</div><div class="ev-chips">
+          <button class="ev-chip">バラ</button><button class="ev-chip">スミレ</button><button class="ev-chip">白い花</button><button class="ev-chip">ハーブ</button><button class="ev-chip">草</button><button class="ev-chip">ピーマン</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">香辛料</div><div class="ev-chips">
+          <button class="ev-chip">コショウ</button><button class="ev-chip">シナモン</button><button class="ev-chip">クローブ</button><button class="ev-chip">ナツメグ</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">樽・熟成香</div><div class="ev-chips">
+          <button class="ev-chip">バニラ</button><button class="ev-chip">トースト</button><button class="ev-chip">スモーク</button><button class="ev-chip">チョコレート</button><button class="ev-chip">コーヒー</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">土・鉱物・その他</div><div class="ev-chips">
+          <button class="ev-chip">土</button><button class="ev-chip">ミネラル</button><button class="ev-chip">革</button><button class="ev-chip">タバコ</button><button class="ev-chip">キノコ</button>
+        </div></div>
+      </div>
+      <div id="ev-panel-flavor" class="ev-panel">
+        <div class="ev-cat"><div class="ev-cat-label">甘味</div><div class="ev-chips">
+          <button class="ev-chip">辛口</button><button class="ev-chip">やや辛口</button><button class="ev-chip">やや甘口</button><button class="ev-chip">甘口</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">酸味</div><div class="ev-chips">
+          <button class="ev-chip">酸味 強い</button><button class="ev-chip">酸味 中程度</button><button class="ev-chip">酸味 弱い</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">タンニン（赤）</div><div class="ev-chips">
+          <button class="ev-chip">タンニン 強い</button><button class="ev-chip">タンニン 中程度</button><button class="ev-chip">タンニン 弱い</button><button class="ev-chip">なめらか</button><button class="ev-chip">収斂性がある</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">ボディ・アルコール</div><div class="ev-chips">
+          <button class="ev-chip">フルボディ</button><button class="ev-chip">ミディアムボディ</button><button class="ev-chip">ライトボディ</button><button class="ev-chip">アルコール 強い</button><button class="ev-chip">アルコール 中程度</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">余韻</div><div class="ev-chips">
+          <button class="ev-chip">余韻 非常に長い</button><button class="ev-chip">余韻 長い</button><button class="ev-chip">余韻 中程度</button><button class="ev-chip">余韻 短い</button>
+        </div></div>
+        <div class="ev-cat"><div class="ev-cat-label">総評</div><div class="ev-chips">
+          <button class="ev-chip">調和がとれている</button><button class="ev-chip">エレガント</button><button class="ev-chip">力強い</button><button class="ev-chip">複雑味がある</button>
+        </div></div>
+      </div>
+      <div id="ev-preview" class="ev-preview"></div>
+      <button class="ev-done-btn" onclick="window.closeExamModal()">✓ 入力を完了する</button>
+    </div>
+  </div>
+</div>
+
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
