@@ -142,7 +142,7 @@ tailwind.config = {
       <!-- Info -->
       <div class="flex-1 min-w-0" style="padding-top:4px;">
         <h1 class="font-pf text-[#241015]" style="font-size:40px;font-weight:600;line-height:1.18;margin-bottom:14px;">
-          Château Margaux <span style="font-size:32px;font-weight:500;">2018</span>
+          Château Margaux <span id="v3-wine-vintage-span" style="font-size:32px;font-weight:500;">2018</span>
         </h1>
         <!-- Chips -->
         <div class="flex flex-wrap" style="gap:8px;margin-bottom:14px;">
@@ -1104,7 +1104,7 @@ function collectCurrentEntry() {
   const h1El = document.getElementById('v3-wine-title');
   let wineName = '', vintage = '';
   if (h1El) {
-    const spanEl = h1El.querySelector('span');
+    const spanEl = document.getElementById('v3-wine-vintage-span');
     vintage = spanEl ? spanEl.innerText.trim() : '';
     wineName = h1El.innerText.replace(vintage, '').trim();
   }
@@ -1151,7 +1151,7 @@ function collectCurrentEntry() {
 function fillEntry(entry) {
   const h1El = document.getElementById('v3-wine-title');
   if (h1El) {
-    const spanEl = h1El.querySelector('span');
+    const spanEl = document.getElementById('v3-wine-vintage-span');
     if (spanEl) {
       const tn = h1El.firstChild;
       if (tn && tn.nodeType === 3) tn.textContent = (entry.wineName || '') + ' ';
@@ -1440,7 +1440,7 @@ function showNew() {
   const h1El = document.getElementById('v3-wine-title');
   if (h1El) {
     const tn = h1El.firstChild;
-    const spanEl = h1El.querySelector('span');
+    const spanEl = document.getElementById('v3-wine-vintage-span');
     if (tn && tn.nodeType === 3) tn.textContent = '';
     if (spanEl) spanEl.textContent = '';
   }
