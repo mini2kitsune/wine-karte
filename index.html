@@ -947,6 +947,15 @@ function enableInlineEdit() {
     el.addEventListener('focus', () => { el.style.boxShadow = '0 0 0 2px #D4AF37'; el.style.borderRadius = '6px'; });
     el.addEventListener('blur',  () => { el.style.boxShadow = ''; el.style.borderRadius = ''; });
   });
+
+  // v3-meta-vintageの入力をh1内のspanにリアルタイム同期（表示用）
+  const metaVintage = document.getElementById('v3-meta-vintage');
+  if (metaVintage) {
+    metaVintage.addEventListener('input', () => {
+      const spanEl = document.getElementById('v3-wine-vintage-span');
+      if (spanEl) spanEl.textContent = metaVintage.innerText.trim();
+    });
+  }
 }
 
 // ── Date Picker ───────────────────────────────────────────────────────────────
@@ -1104,9 +1113,13 @@ function collectCurrentEntry() {
   const h1El = document.getElementById('v3-wine-title');
   let wineName = '', vintage = '';
   if (h1El) {
+    // ユーザーが編集するのはv3-meta-vintageなので、そちらを正とする
+    const metaVintageEl = document.getElementById('v3-meta-vintage');
     const spanEl = document.getElementById('v3-wine-vintage-span');
-    vintage = spanEl ? spanEl.innerText.trim() : '';
-    wineName = h1El.innerText.replace(vintage, '').trim();
+    const metaVal = metaVintageEl ? metaVintageEl.innerText.trim() : '';
+    vintage = (metaVal && metaVal !== '—') ? metaVal : (spanEl ? spanEl.innerText.trim() : '');
+    const spanText = spanEl ? spanEl.innerText.trim() : '';
+    wineName = h1El.innerText.replace(spanText, '').trim();
   }
 
   const starsDiv = document.getElementById('stars');
@@ -1862,45 +1875,38 @@ async function initWineNotesAuth() {
   if (!window.supabase) { console.warn('[WN] supabase-js not loaded'); return; }
   sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // 現在のセッション確認
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    document.getElementById('wn-login-overlay').style.display = 'none';
-    // ローカルにデータがない場合のみSupabaseから取得（クロスデバイス初回起動）
-    const localArr = loadData();
-    if (localArr.length === 0) {
-      loadAllFromSupabase().then(() => {
-        const arr = loadData();
-        if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
-      });
-    }
-  } else {
-    // セッションなし → フォームを表示
-    document.getElementById('wn-login-loading').style.display = 'none';
-    document.getElementById('wn-login-form').style.display = 'block';
-  }
-
-  // 今後の認証状態変化を監視
+  // Supabase v2: onAuthStateChange登録時にINITIAL_SESSIONが即時発火する。
+  // getSession()と併用すると競合するため、INITIAL_SESSIONで一元管理する。
   sbClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      const isNewLogin = !currentUser; // トークン更新との区別
-      currentUser = session.user;
-      document.getElementById('wn-login-overlay').style.display = 'none';
-      if (isNewLogin) {
-        // 新規ログイン時のみナビゲート（トークン更新時は入力中画面を維持）
+    if (event === 'INITIAL_SESSION') {
+      // ページロード時の既存セッション確認（getSession()の代替）
+      if (session) {
+        currentUser = session.user;
+        document.getElementById('wn-login-overlay').style.display = 'none';
+        // ローカルにデータがない場合のみSupabaseから取得（新デバイス初回）
         const localArr = loadData();
         if (localArr.length === 0) {
           await loadAllFromSupabase();
+          const arr = loadData();
+          if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
         }
-        const arr = loadData();
-        if (arr.length > 0) {
-          currentId = arr[0].id;
-          fillEntry(arr[0]);
-        } else {
-          showNew();
-        }
+      } else {
+        // セッションなし → ログインフォームを表示
+        document.getElementById('wn-login-loading').style.display = 'none';
+        document.getElementById('wn-login-form').style.display = 'block';
       }
+    } else if (event === 'SIGNED_IN' && session) {
+      // ログインボタン押下による新規サインイン時のみここに来る
+      currentUser = session.user;
+      document.getElementById('wn-login-overlay').style.display = 'none';
+      const localArr = loadData();
+      if (localArr.length === 0) await loadAllFromSupabase();
+      const arr = loadData();
+      if (arr.length > 0) { currentId = arr[0].id; fillEntry(arr[0]); }
+      else showNew();
+    } else if (event === 'TOKEN_REFRESHED' && session) {
+      // トークン自動更新：currentUserを更新するだけ（ナビゲート禁止）
+      currentUser = session.user;
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
       document.getElementById('wn-login-loading').style.display = 'block';
