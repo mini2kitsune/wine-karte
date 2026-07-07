@@ -1885,6 +1885,7 @@ async function sbDeleteEntry(id) {
 }
 
 // 全件取得して localStorage キャッシュを更新
+// 【2026-07-07 再発防止】Supabase 空データで localStorage を上書き禁止
 async function loadAllFromSupabase() {
   if (!sbClient || !currentUser) return;
   try {
@@ -1893,8 +1894,16 @@ async function loadAllFromSupabase() {
       .select('*')
       .order('created_at_ts', { ascending: false });
     if (error) { console.warn('[WN] loadAll error', error.message); return; }
-    const entries = (data || []).map(rowToEntry);
-    saveData(entries);
+    const remoteEntries = (data || []).map(rowToEntry);
+    const localEntries = loadData();
+    // 【最重要ガード】リモートが空 + ローカルにデータあり → 上書きせず保護
+    if (remoteEntries.length === 0 && localEntries.length > 0) {
+      console.warn('[WN] Supabase空・localStorage保護（自動移行しない）');
+      showToast('Supabase未同期のデータあり。設定から手動移行をお願いします');
+      return;
+    }
+    // それ以外は通常の同期（リモートが正）
+    saveData(remoteEntries);
   } catch(e) { console.warn('[WN] loadAllFromSupabase failed', e); }
 }
 
