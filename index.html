@@ -311,6 +311,14 @@ tailwind.config = {
     </div>
   </div>
 
+  <!-- RAW MEMO（📥 取り込み原文・空なら非表示） -->
+  <div id="v3-raw-memo-wrap" style="padding:0 18px;margin-top:14px;display:none;">
+    <details style="background:#FBF8F1;border:1px dashed #D9CBAF;border-radius:26px;padding:18px 26px;">
+      <summary style="cursor:pointer;font-size:21px;color:#6B5B4B;font-weight:600;-webkit-tap-highlight-color:transparent;">📥 元のメモ（原文のまま）</summary>
+      <div id="v3-raw-memo" style="margin-top:14px;font-size:20px;line-height:1.9;color:#4a3a30;white-space:pre-wrap;word-break:break-word;"></div>
+    </details>
+  </div>
+
   <!-- FOOTER — target 45px -->
   <nav id="in-phone-nav" class="flex items-center border-t border-hair bg-ivory" style="padding:10px 14px;margin-top:14px;">
     <button class="flex-1 flex items-center justify-center text-ink-soft" style="gap:10px;font-size:24px;">
@@ -687,6 +695,7 @@ function showToast(msg) {
 // ── State ────────────────────────────────────────────────────────────────────
 let currentRating = 4.5;
 let currentId = null;
+let currentRawMemo = ''; // 📥 取り込み時の原文メモ（表示中エントリのもの）
 const NEW_ENTRY_ID = '__new__';
 
 // ── Stars ────────────────────────────────────────────────────────────────────
@@ -1160,6 +1169,7 @@ function collectCurrentEntry() {
     isFav,
     photo: photoSrc,
     aiComment: getText('v3-ai-comment'),
+    rawMemo: currentRawMemo || '',
   };
 }
 
@@ -1191,6 +1201,15 @@ function fillEntry(entry) {
   setText('v3-taste-flavor',  entry.tasteFlavor);
   setText('v3-taste-memo',    entry.tasteMemo);
   setText('v3-ai-comment',    entry.aiComment);
+
+  // 📥 元のメモ（取り込み原文）: あれば折りたたみブロックを表示
+  currentRawMemo = entry.rawMemo || '';
+  const rawWrap = document.getElementById('v3-raw-memo-wrap');
+  const rawEl   = document.getElementById('v3-raw-memo');
+  if (rawWrap && rawEl) {
+    if (currentRawMemo) { rawEl.innerText = currentRawMemo; rawWrap.style.display = 'block'; }
+    else { rawEl.innerText = ''; rawWrap.style.display = 'none'; }
+  }
 
   // 写真は常にリセット（前のエントリの残像を防ぐ）
   const photoImg = document.getElementById('v3-photo');
@@ -1372,6 +1391,7 @@ function showList() {
            <div style="font-size:48px;">🍷</div>
            <div style="font-size:17px;color:#9A8C7C;text-align:center;">まだ記録がありません</div>
            <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:24px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">最初のワインを記録する</button>
+           <button onclick="window.showInbox()" style="background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:24px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 過去のメモから取り込む</button>
          </div>`
       : `<div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
            ${migrateBanner}
@@ -1402,7 +1422,10 @@ function showList() {
     listEl.innerHTML = `
       <div style="position:sticky;top:0;z-index:10;background:#FAF6EF;border-bottom:1px solid #E7DECB;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
         <h1 style="font-family:'Playfair Display',serif;font-size:20px;color:#241015;font-weight:700;margin:0;">🍷 コレクション</h1>
-        <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">+ 記録する</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="window.showInbox()" style="background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:20px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 取り込み</button>
+          <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">+ 記録する</button>
+        </div>
       </div>
       ${emptyState}`;
     return;
@@ -1414,11 +1437,15 @@ function showList() {
     ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;color:#9A8C7C;font-size:28px;gap:20px;">
          <div>まだ記録がありません</div>
          <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:18px 40px;font-size:26px;cursor:pointer;">最初のワインを記録する</button>
+         <button onclick="window.showInbox()" style="background:transparent;border:2px solid #5B0E1A;color:#5B0E1A;border-radius:40px;padding:14px 34px;font-size:22px;cursor:pointer;font-family:'Noto Serif JP',serif;">📥 過去のメモから取り込む</button>
        </div>`
     : `<div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
            <h2 style="font-family:'Playfair Display',serif;font-size:32px;color:#241015;">🍷 コレクション</h2>
-           <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:12px 28px;font-size:22px;cursor:pointer;">+ 記録する</button>
+           <div style="display:flex;gap:12px;align-items:center;">
+             <button onclick="window.showInbox()" style="background:transparent;border:2px solid #5B0E1A;color:#5B0E1A;border-radius:40px;padding:10px 24px;font-size:20px;cursor:pointer;font-family:'Noto Serif JP',serif;">📥 取り込み</button>
+             <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:12px 28px;font-size:22px;cursor:pointer;">+ 記録する</button>
+           </div>
          </div>
          ${migrateBanner}
          ${arr.map(e => `
@@ -1460,6 +1487,7 @@ function showEntry(id) {
 function showNew() {
   hideMobileList();
   currentId = NEW_ENTRY_ID;
+  currentRawMemo = '';
   document.getElementById('scaler').innerHTML = ORIGINAL_SCALER_HTML;
   reinitAll();
 
@@ -1645,7 +1673,7 @@ function saveQuickEntry() {
     wineName: name, vintage: '', producer: '', country: '', grape: '',
     wineType, drinkDate, price: '', shop: '',
     tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: memo,
-    rating: qeRating, wantAgain: 'はい', isFav: false, photo: '', aiComment: '',
+    rating: qeRating, wantAgain: 'はい', isFav: false, photo: '', aiComment: '', rawMemo: '',
   };
 
   const arr = loadData();
@@ -1655,10 +1683,10 @@ function saveQuickEntry() {
   if (ok) {
     showEntry(entry.id);
     showToast('✓ 保存しました');
-    // star_chart hook: R017ワインテイスティング自動点灯（クイック入力は常に新規・credit 1.0）
+    // star_chart hook: R017ワインテイスティング自動点灯（クイック入力=常に新規）
     try {
       const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
-      _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note' });
+      _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-quick' });
       localStorage.setItem('star_chart_events', JSON.stringify(_sc));
     } catch (_e) {}
     sbUpsertEntry(entry);
@@ -1804,6 +1832,7 @@ function entryToRow(entry) {
     is_fav:        entry.isFav        || false,
     photo:         entry.photo        || '',
     ai_comment:    entry.aiComment    || '',
+    raw_memo:      entry.rawMemo      || '',
   };
 }
 
@@ -1830,6 +1859,7 @@ function rowToEntry(row) {
     isFav:       row.is_fav        || false,
     photo:       row.photo         || '',
     aiComment:   row.ai_comment    || '',
+    rawMemo:     row.raw_memo      || '',
   };
 }
 
@@ -2038,6 +2068,264 @@ async function doWNMagicLink() {
 }
 window.doWNMagicLink = doWNMagicLink;
 
+// ══════════════════════════════════════════════════════
+// 📥 メモ取り込みインボックス
+//    メモアプリの走り書き / AI添削の返信 を貼るだけでカルテ化する
+//    優先度: ①```json ブロック → ②ラベル行の解析 → ③先頭行=ワイン名
+//    原文は必ず entry.rawMemo に保存され、カルテで読み返せる
+// ══════════════════════════════════════════════════════
+function showInbox() {
+  const t = document.getElementById('ib-text');
+  if (t) t.value = '';
+  document.getElementById('inbox-modal').classList.add('open');
+  setTimeout(() => { if (t) t.focus(); }, 150);
+}
+window.showInbox = showInbox;
+
+function closeInbox() {
+  const m = document.getElementById('inbox-modal');
+  if (m) m.classList.remove('open');
+}
+window.closeInbox = closeInbox;
+
+// 外部AI（ChatGPT / Claude 等）に貼るための添削依頼文を組み立てる
+function buildInboxPrompt(memo) {
+  return [
+    'あなたは日本ソムリエ協会ワインエキスパート二次試験の講師です。以下は私のワインテイスティングメモです。',
+    '',
+    '--- メモここから ---',
+    memo,
+    '--- メモここまで ---',
+    '',
+    'お願い:',
+    '1. テイスティング表現を二次試験の観点（外観・香り・味わい・余韻）で優しく添削し、10点満点で評価してください。',
+    '2. 回答の最後に、次のキーを持つJSONを ```json コードブロックで出力してください:',
+    'wine_name, vintage, producer, country, grape, wine_type（"赤ワイン"/"白ワイン"/"ロゼ"/"スパークリング"/"甘口"のいずれか）, drink_date（"YYYY / MM / DD" 形式・不明なら空文字）, price, shop, taste_look, taste_aroma, taste_flavor, taste_memo, rating（0〜5の0.5刻み・読み取れなければ4）, ai_comment（添削の要約を2〜3文・優しい口調で）',
+    '※メモに書かれていない情報は創作せず、空文字にしてください。'
+  ].join('\n');
+}
+
+async function copyInboxPrompt() {
+  const t = document.getElementById('ib-text');
+  const memo = (t ? t.value : '').trim();
+  if (!memo) {
+    if (t) {
+      t.focus();
+      t.style.borderColor = '#ef5350';
+      setTimeout(() => { t.style.borderColor = ''; }, 1500);
+    }
+    showToast('先にメモを貼り付けてください');
+    return;
+  }
+  const prompt = buildInboxPrompt(memo);
+  let ok = false;
+  try { await navigator.clipboard.writeText(prompt); ok = true; }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = prompt;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      ok = document.execCommand('copy');
+      ta.remove();
+    } catch (e2) { ok = false; }
+  }
+  showToast(ok ? '✓ コピーしました。AIに貼り付けて、返信をここに貼り直してください' : 'コピーに失敗しました');
+}
+window.copyInboxPrompt = copyInboxPrompt;
+
+function wnNormalizeWineType(s) {
+  const t = s || '';
+  if (/赤/.test(t)) return '赤ワイン';
+  if (/白/.test(t)) return '白ワイン';
+  if (/ロゼ/.test(t)) return 'ロゼ';
+  if (/泡|スパーク|シャンパ/.test(t)) return 'スパークリング';
+  if (/甘/.test(t)) return '甘口';
+  return '';
+}
+
+function wnClampRating(v) {
+  const r = parseFloat(v);
+  if (isNaN(r)) return null;
+  return Math.max(0, Math.min(5, Math.round(r * 2) / 2));
+}
+
+// 貼り付けテキスト → カルテ項目
+function parseInboxText(raw) {
+  // ① ```json ブロック（AI返信の構造化部分）を最優先で解析
+  let jsonStr = null;
+  const fence = raw.match(/```json\s*([\s\S]*?)```/i) || raw.match(/```\s*(\{[\s\S]*?\})\s*```/);
+  if (fence) jsonStr = fence[1];
+  else {
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}');
+    if (s !== -1 && e > s) {
+      const cand = raw.slice(s, e + 1);
+      if (/"(wine_name|wineName|taste_look|tasteLook|grape)"/.test(cand)) jsonStr = cand;
+    }
+  }
+  if (jsonStr) {
+    try {
+      const j = JSON.parse(jsonStr);
+      const pick = (a, b) => {
+        const v = (j[a] !== undefined && j[a] !== null) ? j[a] : j[b];
+        return (v === null || v === undefined) ? '' : String(v).trim();
+      };
+      const out = {
+        wineName:    pick('wine_name', 'wineName'),
+        vintage:     pick('vintage', 'vintage'),
+        producer:    pick('producer', 'producer'),
+        country:     pick('country', 'country'),
+        grape:       pick('grape', 'grape'),
+        wineType:    wnNormalizeWineType(pick('wine_type', 'wineType')),
+        drinkDate:   pick('drink_date', 'drinkDate'),
+        price:       pick('price', 'price'),
+        shop:        pick('shop', 'shop'),
+        tasteLook:   pick('taste_look', 'tasteLook'),
+        tasteAroma:  pick('taste_aroma', 'tasteAroma'),
+        tasteFlavor: pick('taste_flavor', 'tasteFlavor'),
+        tasteMemo:   pick('taste_memo', 'tasteMemo'),
+        aiComment:   pick('ai_comment', 'aiComment'),
+        rating:      wnClampRating(j.rating),
+      };
+      if (out.wineName || out.tasteAroma || out.tasteFlavor) return out;
+    } catch (e) { /* JSONが壊れていたらラベル解析へフォールバック */ }
+  }
+
+  // ② ラベル行（「香り: 〜」等）のヒューリスティック解析
+  const LABELS = [
+    [/^(ワイン名|銘柄|名前)$/, 'wineName'],
+    [/^(生産者|ドメーヌ|シャトー|ワイナリー)$/, 'producer'],
+    [/^(産地|生産地|国|地域)$/, 'country'],
+    [/^(品種|ぶどう品種|ブドウ品種|セパージュ)$/, 'grape'],
+    [/^(タイプ|種類)$/, '_type'],
+    [/^(ヴィンテージ|ビンテージ|収穫年|年号)$/, 'vintage'],
+    [/^(飲んだ日|日付|テイスティング日)$/, 'drinkDate'],
+    [/^(価格|購入価格|値段)$/, 'price'],
+    [/^(購入場所|購入店|店|ショップ)$/, 'shop'],
+    [/^(見た目|外観|色|色調|色合い)$/, 'tasteLook'],
+    [/^(香り|アロマ|ノーズ)$/, 'tasteAroma'],
+    [/^(味わい|味|テイスト|口当たり)$/, 'tasteFlavor'],
+    [/^(余韻|フィニッシュ)$/, '_finish'],
+    [/^(メモ|一言メモ|一言|感想|ペアリング|合わせた料理)$/, 'tasteMemo'],
+    [/^(評価|点数|星)$/, '_rating'],
+    [/^(添削|AI添削|AIコメント|講評|コメント)$/, 'aiComment'],
+  ];
+  const buf = {};
+  const push = (k, v) => { if (!v) return; buf[k] = buf[k] ? buf[k] + '\n' + v : v; };
+  let currentKey = null;
+  raw.split(/\r?\n/).forEach(line => {
+    if (!line.trim()) { currentKey = null; return; } // 空行でセクション終了
+    const m = line.match(/^\s*[■●◆・\-*#>]*\s*([^:：]{1,12})[:：]\s*(.*)$/);
+    if (m) {
+      const label = m[1].trim();
+      for (const [re, key] of LABELS) {
+        if (re.test(label)) { currentKey = key; push(key, m[2].trim()); return; }
+      }
+    }
+    if (currentKey) push(currentKey, line.trim()); // ラベル直下の続き行
+  });
+
+  const out = {
+    wineName:    buf.wineName || '',
+    vintage:     buf.vintage || '',
+    producer:    buf.producer || '',
+    country:     buf.country || '',
+    grape:       buf.grape || '',
+    wineType:    wnNormalizeWineType(buf._type || ''),
+    drinkDate:   buf.drinkDate || '',
+    price:       buf.price || '',
+    shop:        buf.shop || '',
+    tasteLook:   buf.tasteLook || '',
+    tasteAroma:  buf.tasteAroma || '',
+    tasteFlavor: buf.tasteFlavor || '',
+    tasteMemo:   buf.tasteMemo || '',
+    aiComment:   buf.aiComment || '',
+    rating:      null,
+  };
+  if (buf._finish) out.tasteFlavor = (out.tasteFlavor ? out.tasteFlavor + '\n' : '') + '余韻: ' + buf._finish;
+  if (buf._rating) {
+    const stars = (buf._rating.match(/[★⭐]/g) || []).length;
+    out.rating = wnClampRating(stars || (buf._rating.match(/\d+(\.\d+)?/) || [])[0]);
+  }
+
+  // ③ フォールバック: 先頭行をワイン名に、残りを一言メモに
+  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!out.wineName && lines.length) {
+    const first = lines[0].replace(/^[■●◆・\-*#>🍷🥂\s]+/, '');
+    if (first && first.length <= 40) out.wineName = first;
+  }
+  const hasTasting = out.tasteLook || out.tasteAroma || out.tasteFlavor || out.tasteMemo;
+  if (!hasTasting) out.tasteMemo = lines.slice(out.wineName ? 1 : 0).join('\n');
+
+  // ワイン名末尾の年号をヴィンテージへ（例: シャトー・マルゴー 2018）
+  if (!out.vintage && out.wineName) {
+    const ym = out.wineName.match(/^(.*\S)\s+((?:19|20)\d{2})$/);
+    if (ym) { out.wineName = ym[1]; out.vintage = ym[2]; }
+  }
+  if (!out.wineType) out.wineType = wnNormalizeWineType(raw.slice(0, 200));
+  return out;
+}
+
+function importInbox() {
+  const t = document.getElementById('ib-text');
+  const raw = (t ? t.value : '').trim();
+  if (!raw) {
+    if (t) {
+      t.focus();
+      t.style.borderColor = '#ef5350';
+      setTimeout(() => { t.style.borderColor = ''; }, 1500);
+    }
+    return;
+  }
+  const p = parseInboxText(raw);
+
+  const now = new Date();
+  const days = ['日','月','火','水','木','金','土'];
+  const today = `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
+
+  const entry = {
+    id: Date.now().toString(),
+    createdAt: Date.now(),
+    wineName:    p.wineName || '(名称未設定)',
+    vintage:     p.vintage || '',
+    producer:    p.producer || '',
+    country:     p.country || '',
+    grape:       p.grape || '',
+    wineType:    p.wineType || '',
+    drinkDate:   p.drinkDate || today,
+    price:       p.price || '',
+    shop:        p.shop || '',
+    tasteLook:   p.tasteLook || '',
+    tasteAroma:  p.tasteAroma || '',
+    tasteFlavor: p.tasteFlavor || '',
+    tasteMemo:   p.tasteMemo || '',
+    rating:      (p.rating != null ? p.rating : 4),
+    wantAgain:   'はい',
+    isFav:       false,
+    photo:       '',
+    aiComment:   p.aiComment || '',
+    rawMemo:     raw,
+  };
+
+  const arr = loadData();
+  arr.unshift(entry);
+  const ok = saveData(arr);
+  closeInbox();
+  if (ok) {
+    showEntry(entry.id);
+    showToast('✓ メモからカルテを作成しました');
+    // star_chart hook: R017ワインテイスティング自動点灯（インボックス取り込み=新規扱い credit 1.0）
+    try {
+      const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
+      _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-inbox' });
+      localStorage.setItem('star_chart_events', JSON.stringify(_sc));
+    } catch (_e) {}
+    sbUpsertEntry(entry);
+  }
+}
+window.importInbox = importInbox;
+
 })();
 </script>
 <!-- ⚡ クイック入力 FAB (mobile only) -->
@@ -2066,6 +2354,25 @@ window.doWNMagicLink = doWNMagicLink;
       <div class="qe-label">一言メモ</div>
       <textarea id="qe-memo" class="qe-memo" placeholder="感想・ペアリングなど"></textarea>
       <button class="qe-save" onclick="window.saveQuickEntry()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📥 メモ取り込みモーダル -->
+<div id="inbox-modal" class="wine-sheet" onclick="if(event.target===this)window.closeInbox()">
+  <div class="wine-sheet-inner">
+    <div class="ws-header">
+      <div class="ws-title">📥 メモから取り込み</div>
+      <button class="ws-close" onclick="window.closeInbox()">✕</button>
+    </div>
+    <div class="ws-body">
+      <div class="qe-label">メモ / AIの返信を貼り付け</div>
+      <textarea id="ib-text" class="qe-memo" style="height:190px;margin-bottom:12px;" placeholder="メモアプリの走り書きや、AI添削の返信をそのまま貼り付けてください"></textarea>
+      <button onclick="window.copyInboxPrompt()" style="width:100%;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">① 添削依頼文をコピー（AIに貼る用）</button>
+      <div style="font-size:11.5px;color:#9A8C7C;line-height:1.7;margin:10px 2px 14px;">
+        ①をChatGPTやClaudeに貼ると、添削＋整理された返信が届きます。その返信をここに貼り直して②を押すと、各項目に自動で振り分けてカルテを作成します。メモだけで②を押してもOK。<b>元のメモは原文のままカルテに残ります。</b>
+      </div>
+      <button class="qe-save" onclick="window.importInbox()">② 解析してカルテを作成</button>
     </div>
   </div>
 </div>
