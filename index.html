@@ -1248,6 +1248,7 @@ function enableSaveButton() {
       return;
     }
     const arr = loadData();
+    const _isNewEntry = !(currentId && currentId !== NEW_ENTRY_ID);
     if (currentId && currentId !== NEW_ENTRY_ID) {
       const idx = arr.findIndex(e => e.id === currentId);
       if (idx >= 0) {
@@ -1265,6 +1266,13 @@ function enableSaveButton() {
     const ok = saveData(arr);
     if (ok) {
       showToast('✓ 保存しました');
+      // star_chart hook: R017ワインテイスティング自動点灯
+      // 新規エントリ=credit 1.0（心拍）、追記=credit 0.5（体温）[Fable 5仕様]
+      try {
+        const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
+        _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: _isNewEntry ? 1.0 : 0.5, source: 'wine-note' });
+        localStorage.setItem('star_chart_events', JSON.stringify(_sc));
+      } catch (_e) {}
       // Supabase に非同期で保存（ログイン済みの場合のみ）
       const savedEntry = arr.find(e => e.id === currentId);
       if (savedEntry) sbUpsertEntry(savedEntry);
@@ -1647,6 +1655,12 @@ function saveQuickEntry() {
   if (ok) {
     showEntry(entry.id);
     showToast('✓ 保存しました');
+    // star_chart hook: R017ワインテイスティング自動点灯（クイック入力は常に新規・credit 1.0）
+    try {
+      const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
+      _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note' });
+      localStorage.setItem('star_chart_events', JSON.stringify(_sc));
+    } catch (_e) {}
     sbUpsertEntry(entry);
   }
 }
