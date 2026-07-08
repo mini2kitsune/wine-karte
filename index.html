@@ -94,11 +94,26 @@ tailwind.config = {
       style="width:100%;padding:14px;background:#5B0E1A;color:#FAF6EF;border:none;border-radius:10px;font-size:16px;font-weight:700;font-family:'Noto Serif JP',serif;cursor:pointer;margin-bottom:12px;">
       ログイン
     </button>
-    <!-- マジックリンク -->
+    <!-- 6桁コード認証 -->
     <div id="wn-signin-only" style="text-align:center;">
-      <button id="wn-magic-btn" onclick="window.doWNMagicLink()"
+      <button id="wn-magic-btn" onclick="window.doWNSendCode()"
         style="background:none;border:none;color:#5B0E1A;font-size:13px;cursor:pointer;text-decoration:underline;font-family:'Noto Serif JP',serif;">
-        パスワードなしでメールリンクでログイン
+        パスワードなしで6桁コードでログイン
+      </button>
+    </div>
+    <!-- OTPコード入力欄（コード送信後に表示） -->
+    <div id="wn-otp-section" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid #E7DECB;">
+      <div style="font-size:13px;color:#5C4A3A;margin-bottom:8px;text-align:center;font-family:'Noto Serif JP',serif;">メールに届いた6桁の数字を入力</div>
+      <input id="wn-otp-code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456"
+        style="width:100%;padding:12px 14px;border:1.5px solid #E7DECB;border-radius:10px;font-size:20px;text-align:center;letter-spacing:8px;font-family:'Noto Serif JP',serif;background:#fff;color:#241015;outline:none;box-sizing:border-box;margin-bottom:10px;"
+        onkeydown="if(event.key==='Enter')window.doWNVerifyCode()">
+      <button onclick="window.doWNVerifyCode()"
+        style="width:100%;padding:14px;background:#5B0E1A;color:#FAF6EF;border:none;border-radius:10px;font-size:16px;font-weight:700;font-family:'Noto Serif JP',serif;cursor:pointer;margin-bottom:8px;">
+        コードで認証
+      </button>
+      <button onclick="window.doWNSendCode()"
+        style="background:none;border:none;color:#5C4A3A;font-size:12px;cursor:pointer;text-decoration:underline;font-family:'Noto Serif JP',serif;">
+        コードを再送
       </button>
     </div>
   </div>
@@ -2046,7 +2061,9 @@ async function doWNAuth() {
 }
 window.doWNAuth = doWNAuth;
 
-async function doWNMagicLink() {
+let _wnOtpEmail = '';
+
+async function doWNSendCode() {
   if (!sbClient) return;
   const email = (document.getElementById('wn-login-email').value || '').trim();
   const errEl = document.getElementById('wn-login-error');
@@ -2062,20 +2079,46 @@ async function doWNMagicLink() {
   try {
     const { error } = await sbClient.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: 'https://mini2kitsune.github.io/wine-karte/' }
+      options: { shouldCreateUser: false }
     });
     if (error) throw error;
+    _wnOtpEmail = email;
+    document.getElementById('wn-otp-section').style.display = 'block';
     errEl.style.color = '#27ae60';
-    errEl.textContent = 'ログインリンクをメールに送りました。メールアプリで確認してください。';
+    errEl.textContent = '6桁コードをメールに送りました。メール本文の数字を入力してください（リンクは押さないで）';
+    setTimeout(() => { document.getElementById('wn-otp-code').focus(); }, 100);
   } catch(e) {
     errEl.style.color = '#c0392b';
     errEl.textContent = e.message || '送信に失敗しました';
   } finally {
     btn.disabled = false;
-    btn.textContent = 'パスワードなしでメールリンクでログイン';
+    btn.textContent = 'パスワードなしで6桁コードでログイン';
   }
 }
-window.doWNMagicLink = doWNMagicLink;
+window.doWNSendCode = doWNSendCode;
+
+async function doWNVerifyCode() {
+  if (!sbClient) return;
+  const token = (document.getElementById('wn-otp-code').value || '').trim();
+  const errEl = document.getElementById('wn-login-error');
+  if (!token || token.length !== 6) { errEl.style.color = '#c0392b'; errEl.textContent = '6桁のコードを入力してください'; return; }
+  if (!_wnOtpEmail) { errEl.style.color = '#c0392b'; errEl.textContent = '先にメールアドレスを入力してコードを送信してください'; return; }
+  errEl.style.color = '#5C4A3A';
+  errEl.textContent = '確認中...';
+  try {
+    const { error } = await sbClient.auth.verifyOtp({ email: _wnOtpEmail, token, type: 'email' });
+    if (error) throw error;
+    errEl.style.color = '#27ae60';
+    errEl.textContent = 'ログイン成功';
+  } catch(e) {
+    let msg = e.message || 'コードが違います';
+    if (/expired/i.test(msg)) msg = 'コードの有効期限が切れました。再送してください';
+    else if (/invalid/i.test(msg)) msg = 'コードが違います。メールをご確認ください';
+    errEl.style.color = '#c0392b';
+    errEl.textContent = msg;
+  }
+}
+window.doWNVerifyCode = doWNVerifyCode;
 
 // ══════════════════════════════════════════════════════
 // 📥 メモ取り込みインボックス
