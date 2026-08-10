@@ -1590,6 +1590,22 @@ function enableMobileFixedNav() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+let _autoSaveTimer = null;
+function triggerAutoSave() {
+  if (!currentId || currentId === NEW_ENTRY_ID) return;
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(() => {
+    const entry = collectCurrentEntry();
+    if (!entry.wineName && !entry.tasteLook) return;
+    const arr = loadData();
+    const idx = arr.findIndex(e => e.id === currentId);
+    if (idx < 0) return;
+    arr[idx] = { ...arr[idx], ...entry, id: currentId, createdAt: arr[idx].createdAt };
+    saveData(arr);
+    sbUpsertEntry({ ...arr[idx] });
+  }, 2000);
+}
+
 function reinitAll() {
   initDOMTargets();
   enableInlineEdit();
@@ -1603,6 +1619,13 @@ function reinitAll() {
   enableActionButtons();
   enableFooterNav();
   enableTastingEditButtons();
+  // 自動保存: テキスト入力・contenteditable 変更を監視
+  document.querySelectorAll('[contenteditable="true"], textarea:not(#qe-memo):not(#ib-text)').forEach(el => {
+    if (!el.dataset.autoSaveWired) {
+      el.addEventListener('input', triggerAutoSave);
+      el.dataset.autoSaveWired = '1';
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2404,6 +2427,7 @@ window.importInbox = importInbox;
       <div class="qe-label">一言メモ</div>
       <textarea id="qe-memo" class="qe-memo" placeholder="感想・ペアリングなど"></textarea>
       <button class="qe-save" onclick="window.saveQuickEntry()">保存する</button>
+      <button onclick="window.closeQuickEntry();window.showInbox();" style="width:100%;margin-top:10px;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 メモから取り込む</button>
     </div>
   </div>
 </div>
