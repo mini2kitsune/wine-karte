@@ -1614,10 +1614,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const arr = loadData();
   if (arr.length > 0) {
-    currentId = arr[0].id;
-    fillEntry(arr[0]);
+    showList();
   } else {
-    // 初回起動: テンプレート文言を空状態に切替えて『新しい記録』モードを表示
     showNew();
   }
 
