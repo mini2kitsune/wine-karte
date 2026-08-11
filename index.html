@@ -1725,7 +1725,10 @@ function showQuickEntry() {
   if (detailSection) detailSection.classList.remove('open');
   if (detailToggle) detailToggle.textContent = '▶ もっと詳しく書く（試験対策）';
   document.querySelectorAll('#qe-types .qe-type-btn').forEach((b, i) => b.classList.toggle('sel', i === 0));
+  document.querySelectorAll('#qe-countries .qe-type-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('#qe-detail-section .qe-type-btn').forEach(b => b.classList.remove('sel'));
+  const vintageEl = document.getElementById('qe-vintage');
+  if (vintageEl) vintageEl.value = '';
   const modal = document.getElementById('quick-modal');
   if (modal) delete modal.dataset.currentId;
   modal.classList.add('open');
@@ -1779,6 +1782,11 @@ function qeDoSave() {
   const selType = document.querySelector('#qe-types .qe-type-btn.sel');
   const wineType = selType ? selType.dataset.type : '赤ワイン';
 
+  const selCountry = document.querySelector('#qe-countries .qe-type-btn.sel');
+  const country = selCountry ? selCountry.dataset.country : '';
+  const vintageEl2 = document.getElementById('qe-vintage');
+  const vintage = vintageEl2 ? vintageEl2.value.trim() : '';
+
   const selChips = [];
   document.querySelectorAll('#qe-detail-section .qe-type-btn.sel').forEach(b => {
     if (b.dataset.chip) selChips.push(b.dataset.chip);
@@ -1793,7 +1801,7 @@ function qeDoSave() {
   if (existingId) {
     const idx = arr.findIndex(e => e.id === existingId);
     if (idx >= 0) {
-      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo };
+      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo, country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '' };
       arr[idx] = entry;
     }
   }
@@ -1802,7 +1810,7 @@ function qeDoSave() {
     entry = {
       id: Date.now().toString(),
       createdAt: Date.now(),
-      wineName: autoName, vintage: '', producer: '', country: '', grape: '',
+      wineName: autoName, vintage, producer: '', country, grape: '',
       wineType, drinkDate, price: '', shop: '',
       tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: finalMemo,
       rating: qeRating, wantAgain, isFav: false, photo, aiComment: '', rawMemo: '',
@@ -1930,6 +1938,14 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#qe-types .qe-type-btn').forEach(b => b.classList.remove('sel'));
       btn.classList.add('sel');
+    });
+  });
+  // Quick Entry country buttons (toggle: tap again to deselect)
+  document.querySelectorAll('#qe-countries .qe-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const already = btn.classList.contains('sel');
+      document.querySelectorAll('#qe-countries .qe-type-btn').forEach(b => b.classList.remove('sel'));
+      if (!already) btn.classList.add('sel');
     });
   });
   // Quick Entry detail chips (toggle select)
@@ -2530,7 +2546,27 @@ window.importInbox = importInbox;
     <div class="ws-body">
       <!-- ① ワイン名 -->
       <div class="qe-label">ワイン名 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（空欄でも保存できます）</span></div>
-      <input id="qe-name" class="qe-input" type="text" placeholder="例: シャトー・マルゴー 2018" autocomplete="off">
+      <input id="qe-name" class="qe-input" type="text" placeholder="例: シャトー・マルゴー" autocomplete="off">
+      <!-- ① 産地・ヴィンテージ -->
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;margin-top:2px;">
+        <div style="flex:1;">
+          <div class="qe-label" style="margin-bottom:6px;">産地 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（任意）</span></div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;" id="qe-countries">
+            <button class="qe-type-btn" data-country="フランス">🇫🇷 仏</button>
+            <button class="qe-type-btn" data-country="イタリア">🇮🇹 伊</button>
+            <button class="qe-type-btn" data-country="スペイン">🇪🇸 西</button>
+            <button class="qe-type-btn" data-country="日本">🇯🇵 日</button>
+            <button class="qe-type-btn" data-country="チリ">🇨🇱 チリ</button>
+            <button class="qe-type-btn" data-country="アメリカ">🇺🇸 米</button>
+            <button class="qe-type-btn" data-country="ドイツ">🇩🇪 独</button>
+            <button class="qe-type-btn" data-country="その他">🌍 他</button>
+          </div>
+        </div>
+        <div style="width:86px;flex-shrink:0;">
+          <div class="qe-label" style="margin-bottom:6px;">年 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（任意）</span></div>
+          <input id="qe-vintage" class="qe-input" type="number" min="1900" max="2030" placeholder="2022" style="text-align:center;padding:8px 4px;margin-bottom:0;">
+        </div>
+      </div>
       <!-- ② 写真 -->
       <div class="qe-label">写真</div>
       <div class="qe-photo-area">
