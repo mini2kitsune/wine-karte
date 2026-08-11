@@ -171,7 +171,8 @@ tailwind.config = {
         <!-- Meta -->
         <dl style="display:flex;flex-direction:column;gap:13px;">
           <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">生産者</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">Château Margaux</dd></div>
-          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">2018</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;cursor:pointer;">2018</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">地域</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">—</dd></div>
           <div class="flex items-center" style="gap:16px;font-size:16px;">
             <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>飲んだ日</dt>
             <dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">2024 / 05 / 20 (月) 20:30</dd>
@@ -660,6 +661,14 @@ window.addEventListener('resize',fitPhone);
   .qe-detail-section { display: none; margin-bottom: 6px; }
   .qe-detail-section.open { display: block; }
   .qe-detail-section .qe-type-btn.sel { background: #7A1322; border-color: #7A1322; color: #FAF6EF; }
+  /* Scroll Picker */
+  #picker-modal .picker-list { padding: 0; max-height: 55vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  #picker-modal .picker-item { padding: 15px 22px; font-size: 17px; font-family: 'Noto Serif JP',serif; color: #3D070F; border-bottom: 1px solid #F0EBE1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #picker-modal .picker-item:active { background: #FAF6EF; }
+  #picker-modal .picker-item.selected { color: #5B0E1A; font-weight: 700; background: #FAF6EF; }
+  .qe-picker-btn { width: 100%; background: #FAF6EF; border: 1.5px solid #DDD5C5; border-radius: 10px; padding: 9px 4px; font-size: 15px; font-family: 'Noto Serif JP',serif; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .qe-picker-btn.has-val { color: #3D070F; font-weight: 600; }
+  .qe-picker-btn:not(.has-val) { color: #C4B5A5; }
   /* ① Exam Vocab */
   .ev-tabs {
     display: flex; border-bottom: 1px solid #E7DECB; flex-shrink: 0; overflow-x: auto;
@@ -799,7 +808,7 @@ function initDOMTargets() {
   if (chips[2]) chips[2].id = 'v3-chip-grape';
 
   const dds = document.querySelectorAll('header ~ div .card dl dd');
-  const ddIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop'];
+  const ddIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-region','v3-meta-date','v3-meta-price','v3-meta-shop'];
   dds.forEach((dd, i) => { if (ddIds[i]) dd.id = ddIds[i]; });
 
   const tastingTexts = document.querySelectorAll('.card .text-ink[style*="font-size:24px"]');
@@ -829,6 +838,7 @@ function initDOMTargets() {
     'v3-wine-title':      'ワイン名を入力してください',
     'v3-meta-producer':   '—',
     'v3-meta-vintage':    '—',
+    'v3-meta-region':     '—',
     'v3-meta-date':       '未入力',
     'v3-meta-price':      '未入力',
     'v3-meta-shop':       '未入力',
@@ -948,12 +958,7 @@ function enableChipEdit() {
 
   if (chipCountry) {
     chipCountry.style.cursor = 'pointer';
-    chipCountry.addEventListener('click', () => {
-      const cur = chipCountry.innerText.trim();
-      const def = (cur === '産地を入力') ? '' : cur;
-      const v = prompt('産地を入力してください（例: フランス / ボルドー）:', def);
-      if (v !== null && v.trim()) setCountryChipFilled(chipCountry, v.trim());
-    });
+    chipCountry.addEventListener('click', () => window.openCountryPickerDetail());
   }
 
   if (chipGrape) {
@@ -1001,7 +1006,7 @@ function showGrapeDialog(currentValue) {
 
 // ── Inline Edit ───────────────────────────────────────────────────────────────
 function enableInlineEdit() {
-  const ids = ['v3-wine-title','v3-meta-producer','v3-meta-vintage',
+  const ids = ['v3-wine-title','v3-meta-producer','v3-meta-region',
     'v3-meta-price','v3-meta-shop','v3-taste-look','v3-taste-aroma',
     'v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
   ids.forEach(id => {
@@ -1014,7 +1019,14 @@ function enableInlineEdit() {
     el.addEventListener('focus', () => { el.style.boxShadow = '0 0 0 2px #D4AF37'; el.style.borderRadius = '6px'; });
     el.addEventListener('blur',  () => { el.style.boxShadow = ''; el.style.borderRadius = ''; });
   });
-
+  // ヴィンテージはピッカーで選択
+  const vintDd = document.getElementById('v3-meta-vintage');
+  if (vintDd && !vintDd.dataset.pickerBound) {
+    vintDd.dataset.pickerBound = '1';
+    vintDd.style.cursor = 'pointer';
+    vintDd.removeAttribute('contenteditable');
+    vintDd.addEventListener('click', () => window.openVintagePicker('detail'));
+  }
 }
 
 // ── Date Picker ───────────────────────────────────────────────────────────────
@@ -1213,6 +1225,7 @@ function collectCurrentEntry() {
     vintage,
     producer:    getText('v3-meta-producer'),
     country:     getChipText('v3-chip-country', '産地を入力'),
+    region:      getText('v3-meta-region'),
     grape:       getChipText('v3-chip-grape',   '品種を入力'),
     wineType:    getChipText('v3-chip-type',    '種類を選択'),
     drinkDate:   getText('v3-meta-date'),
@@ -1251,6 +1264,7 @@ function fillEntry(entry) {
   }
   setText('v3-meta-producer', entry.producer);
   setText('v3-meta-vintage',  entry.vintage);
+  setText('v3-meta-region',   entry.region);
   setText('v3-meta-date',     entry.drinkDate);
   setText('v3-meta-price',    entry.price);
   setText('v3-meta-shop',     entry.shop);
@@ -1464,7 +1478,7 @@ function showList() {
                  </div>
                  <div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap;">
                    ${e.wineType?'<span style="font-size:11px;background:#FAF6EF;border:1px solid #E7DECB;border-radius:8px;padding:2px 7px;color:#6B5B4B;">'+e.wineType+'</span>':''}
-                   ${e.country?'<span style="font-size:11px;color:#9A8C7C;">'+e.country.split('/')[0].trim()+'</span>':''}
+                   ${e.country?'<span style="font-size:11px;color:#9A8C7C;">'+(e.country||'')+(e.region?' / '+e.region:'')+'</span>':''}
                  </div>
                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                    ${wlMiniStars(e.rating)}
@@ -1517,7 +1531,7 @@ function showList() {
                </div>
                <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center;">
                  ${e.wineType?'<span style="font-size:18px;background:#FAF6EF;border:1px solid #E7DECB;border-radius:10px;padding:3px 10px;color:#6B5B4B;">'+e.wineType+'</span>':''}
-                 ${e.country?'<span style="font-size:18px;color:#9A8C7C;">'+e.country.split('/')[0].trim()+'</span>':''}
+                 ${e.country?'<span style="font-size:18px;color:#9A8C7C;">'+(e.country||'')+(e.region?' / '+e.region:'')+'</span>':''}
                </div>
                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                  ${wlMiniStars(e.rating, 20)}
@@ -1557,7 +1571,7 @@ function showNew() {
     if (spanEl) spanEl.textContent = '';
   }
 
-  const clearIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop',
+  const clearIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-region','v3-meta-date','v3-meta-price','v3-meta-shop',
     'v3-taste-look','v3-taste-aroma','v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
   clearIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerText = ''; });
 
@@ -1692,6 +1706,67 @@ document.addEventListener('DOMContentLoaded', function() {
 // ══════════════════════════════════════════════════════
 // ④ クイック入力モード
 // ══════════════════════════════════════════════════════
+// ── Scroll Picker ─────────────────────────────────────────────────────────────
+const PICKER_COUNTRIES = ['フランス','イタリア','スペイン','日本','チリ','アルゼンチン','アメリカ','ドイツ','ポルトガル','オーストラリア','ニュージーランド','南アフリカ','オーストリア','ハンガリー','ジョージア','その他'];
+const PICKER_YEARS = (() => { const a = []; for (let y = new Date().getFullYear(); y >= 1950; y--) a.push(String(y)); return a; })();
+
+let _pickerCb = null;
+function openPicker(title, items, current, cb) {
+  _pickerCb = cb;
+  document.getElementById('picker-title').textContent = title;
+  const list = document.getElementById('picker-list');
+  list.innerHTML = '';
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'picker-item' + (it === current ? ' selected' : '');
+    div.textContent = it;
+    div.onclick = () => window.selectPickerItem(it);
+    list.appendChild(div);
+  });
+  document.getElementById('picker-modal').classList.add('open');
+  const sel = list.querySelector('.selected');
+  if (sel) setTimeout(() => sel.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120);
+}
+function selectPickerItem(value) {
+  if (_pickerCb) _pickerCb(value);
+  closePicker();
+}
+function closePicker() {
+  const m = document.getElementById('picker-modal');
+  if (m) m.classList.remove('open');
+  _pickerCb = null;
+}
+function openVintagePicker(context) {
+  const curEl = context === 'qe' ? document.getElementById('qe-vintage') : document.getElementById('v3-meta-vintage');
+  const cur = curEl ? (curEl.value || curEl.innerText || '').trim() : '';
+  openPicker('ヴィンテージ', PICKER_YEARS, cur, val => {
+    if (context === 'qe') {
+      const inp = document.getElementById('qe-vintage');
+      const btn = document.getElementById('qe-vintage-btn');
+      if (inp) inp.value = val;
+      if (btn) { btn.textContent = val; btn.classList.add('has-val'); }
+    } else {
+      const dd = document.getElementById('v3-meta-vintage');
+      if (dd) dd.innerText = val;
+      const span = document.getElementById('v3-wine-vintage-span');
+      if (span) span.textContent = val;
+      if (typeof triggerAutoSave === 'function') triggerAutoSave();
+    }
+  });
+}
+function openCountryPickerDetail() {
+  const chip = document.getElementById('v3-chip-country');
+  const cur = PICKER_COUNTRIES.find(c => chip && chip.innerText.includes(c)) || '';
+  openPicker('産地（国）', PICKER_COUNTRIES, cur, val => {
+    if (chip) setCountryChipFilled(chip, val);
+    if (typeof triggerAutoSave === 'function') triggerAutoSave();
+  });
+}
+window.closePicker = closePicker;
+window.selectPickerItem = selectPickerItem;
+window.openVintagePicker = openVintagePicker;
+window.openCountryPickerDetail = openCountryPickerDetail;
+
 let qeRating = 4;
 
 function renderQEStars(r) {
@@ -1727,8 +1802,12 @@ function showQuickEntry() {
   document.querySelectorAll('#qe-types .qe-type-btn').forEach((b, i) => b.classList.toggle('sel', i === 0));
   document.querySelectorAll('#qe-countries .qe-type-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('#qe-detail-section .qe-type-btn').forEach(b => b.classList.remove('sel'));
-  const vintageEl = document.getElementById('qe-vintage');
-  if (vintageEl) vintageEl.value = '';
+  const vintageInp = document.getElementById('qe-vintage');
+  if (vintageInp) vintageInp.value = '';
+  const vintageBtn = document.getElementById('qe-vintage-btn');
+  if (vintageBtn) { vintageBtn.textContent = 'タップして選択'; vintageBtn.classList.remove('has-val'); }
+  const regionEl = document.getElementById('qe-region');
+  if (regionEl) regionEl.value = '';
   const modal = document.getElementById('quick-modal');
   if (modal) delete modal.dataset.currentId;
   modal.classList.add('open');
@@ -1786,6 +1865,8 @@ function qeDoSave() {
   const country = selCountry ? selCountry.dataset.country : '';
   const vintageEl2 = document.getElementById('qe-vintage');
   const vintage = vintageEl2 ? vintageEl2.value.trim() : '';
+  const regionEl2 = document.getElementById('qe-region');
+  const region = regionEl2 ? regionEl2.value.trim() : '';
 
   const selChips = [];
   document.querySelectorAll('#qe-detail-section .qe-type-btn.sel').forEach(b => {
@@ -1801,7 +1882,7 @@ function qeDoSave() {
   if (existingId) {
     const idx = arr.findIndex(e => e.id === existingId);
     if (idx >= 0) {
-      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo, country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '' };
+      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo, country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '', region: region || arr[idx].region || '' };
       arr[idx] = entry;
     }
   }
@@ -1810,7 +1891,7 @@ function qeDoSave() {
     entry = {
       id: Date.now().toString(),
       createdAt: Date.now(),
-      wineName: autoName, vintage, producer: '', country, grape: '',
+      wineName: autoName, vintage, producer: '', country, region, grape: '',
       wineType, drinkDate, price: '', shop: '',
       tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: finalMemo,
       rating: qeRating, wantAgain, isFav: false, photo, aiComment: '', rawMemo: '',
@@ -1985,7 +2066,7 @@ function entryToRow(entry) {
     wine_name:     entry.wineName     || '',
     vintage:       entry.vintage      || '',
     producer:      entry.producer     || '',
-    country:       entry.country      || '',
+    country:       [entry.country, entry.region].filter(Boolean).join(' / ') || '',
     grape:         entry.grape        || '',
     wine_type:     entry.wineType     || '',
     drink_date:    entry.drinkDate    || '',
@@ -2012,7 +2093,8 @@ function rowToEntry(row) {
     wineName:    row.wine_name     || '',
     vintage:     row.vintage       || '',
     producer:    row.producer      || '',
-    country:     row.country       || '',
+    country:     (row.country || '').split(' / ')[0].trim(),
+    region:      (row.country || '').includes(' / ') ? (row.country || '').split(' / ').slice(1).join(' / ').trim() : '',
     grape:       row.grape         || '',
     wineType:    row.wine_type     || '',
     drinkDate:   row.drink_date    || '',
@@ -2564,9 +2646,12 @@ window.importInbox = importInbox;
         </div>
         <div style="width:86px;flex-shrink:0;">
           <div class="qe-label" style="margin-bottom:6px;">年 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（任意）</span></div>
-          <input id="qe-vintage" class="qe-input" type="number" min="1900" max="2030" placeholder="2022" style="text-align:center;padding:8px 4px;margin-bottom:0;">
+          <input id="qe-vintage" type="hidden" value="">
+          <button id="qe-vintage-btn" class="qe-picker-btn" onclick="window.openVintagePicker('qe')">タップして選択</button>
         </div>
       </div>
+      <div class="qe-label">地域 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（任意・例: ブルゴーニュ）</span></div>
+      <input id="qe-region" class="qe-input" type="text" placeholder="例: ブルゴーニュ、カリフォルニア" autocomplete="off" style="margin-bottom:14px;">
       <!-- ② 写真 -->
       <div class="qe-label">写真</div>
       <div class="qe-photo-area">
@@ -2739,6 +2824,17 @@ window.importInbox = importInbox;
       <div id="ev-preview" class="ev-preview"></div>
       <button class="ev-done-btn" onclick="window.closeExamModal()">✓ 入力を完了する</button>
     </div>
+  </div>
+</div>
+
+<!-- スクロールピッカーモーダル -->
+<div id="picker-modal" class="wine-sheet" onclick="if(event.target===this)window.closePicker()">
+  <div class="wine-sheet-inner">
+    <div class="ws-header">
+      <div class="ws-title" id="picker-title">選択</div>
+      <button class="ws-close" onclick="window.closePicker()">✕</button>
+    </div>
+    <div id="picker-list" class="picker-list"></div>
   </div>
 </div>
 
