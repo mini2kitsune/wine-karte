@@ -617,6 +617,49 @@ window.addEventListener('resize',fitPhone);
     border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
     font-family: "Noto Serif JP", serif; cursor: pointer;
   }
+  /* ④ Quick Entry - Photo */
+  .qe-photo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .qe-photo-preview {
+    width: 68px; height: 68px; border-radius: 10px; object-fit: cover;
+    border: 1.5px solid #E7DECB; display: none; flex-shrink: 0;
+  }
+  .qe-photo-preview.has-photo { display: block; }
+  .qe-photo-btn {
+    flex: 1; padding: 11px 12px; background: #fff; border: 1.5px dashed #D4AF37;
+    border-radius: 10px; font-size: 14px; font-family: "Noto Serif JP", serif;
+    color: #9A8C7C; cursor: pointer; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* ④ Quick Entry - Want Again toggle */
+  .qe-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-top: 1px solid #E7DECB; margin-top: 8px; margin-bottom: 4px;
+  }
+  .qe-toggle-label { font-size: 14px; color: #4A3F35; font-weight: 600; }
+  .qe-toggle { position: relative; width: 50px; height: 28px; display: inline-block; }
+  .qe-toggle input { opacity: 0; width: 0; height: 0; }
+  .qe-toggle-slider {
+    position: absolute; inset: 0; background: #E7DECB; border-radius: 14px;
+    cursor: pointer; transition: .2s;
+  }
+  .qe-toggle-slider::before {
+    content: ''; position: absolute;
+    width: 22px; height: 22px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: .2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  }
+  .qe-toggle input:checked + .qe-toggle-slider { background: #5B0E1A; }
+  .qe-toggle input:checked + .qe-toggle-slider::before { transform: translateX(22px); }
+  /* ④ Quick Entry - Collapsible detail section */
+  .qe-detail-toggle {
+    width: 100%; padding: 10px; background: transparent; border: 1.5px solid #E7DECB;
+    border-radius: 10px; font-size: 13px; font-family: "Noto Serif JP", serif;
+    color: #9A8C7C; cursor: pointer; text-align: center; margin-bottom: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .qe-detail-section { display: none; margin-bottom: 6px; }
+  .qe-detail-section.open { display: block; }
+  .qe-detail-section .qe-type-btn.sel { background: #7A1322; border-color: #7A1322; color: #FAF6EF; }
   /* ① Exam Vocab */
   .ev-tabs {
     display: flex; border-bottom: 1px solid #E7DECB; flex-shrink: 0; overflow-x: auto;
@@ -1669,66 +1712,135 @@ function showQuickEntry() {
   renderQEStars(4);
   const nameEl = document.getElementById('qe-name');
   const memoEl = document.getElementById('qe-memo');
+  const wantEl = document.getElementById('qe-want-again');
+  const preview = document.getElementById('qe-photo-preview');
+  const photoBtn = document.querySelector('.qe-photo-btn');
+  const detailSection = document.getElementById('qe-detail-section');
+  const detailToggle = document.querySelector('.qe-detail-toggle');
   if (nameEl) nameEl.value = '';
   if (memoEl) memoEl.value = '';
+  if (wantEl) wantEl.checked = true;
+  if (preview) { preview.src = ''; preview.classList.remove('has-photo'); }
+  if (photoBtn) photoBtn.textContent = '📷 写真を追加';
+  if (detailSection) detailSection.classList.remove('open');
+  if (detailToggle) detailToggle.textContent = '▶ もっと詳しく書く（試験対策）';
   document.querySelectorAll('#qe-types .qe-type-btn').forEach((b, i) => b.classList.toggle('sel', i === 0));
-  document.getElementById('quick-modal').classList.add('open');
-  setTimeout(() => { if (nameEl) nameEl.focus(); }, 150);
+  document.querySelectorAll('#qe-detail-section .qe-type-btn').forEach(b => b.classList.remove('sel'));
+  const modal = document.getElementById('quick-modal');
+  if (modal) delete modal.dataset.currentId;
+  modal.classList.add('open');
+  setTimeout(() => { if (memoEl) memoEl.focus(); }, 150);
 }
 window.showQuickEntry = showQuickEntry;
 
 function closeQuickEntry() {
   const m = document.getElementById('quick-modal');
-  if (m) m.classList.remove('open');
-}
-window.closeQuickEntry = closeQuickEntry;
-
-function saveQuickEntry() {
+  if (!m) return;
   const nameEl = document.getElementById('qe-name');
   const memoEl = document.getElementById('qe-memo');
   const name = (nameEl ? nameEl.value : '').trim();
-  if (!name) {
-    if (nameEl) {
-      nameEl.focus();
-      nameEl.style.borderColor = '#ef5350';
-      setTimeout(() => { nameEl.style.borderColor = ''; }, 1500);
+  const memo = (memoEl ? memoEl.value : '').trim();
+  if (name || memo || m.dataset.currentId) {
+    const entry = qeDoSave();
+    m.classList.remove('open');
+    if (entry) {
+      showEntry(entry.id);
+      showToast('✓ 保存しました');
+      try {
+        const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
+        _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-quick' });
+        localStorage.setItem('star_chart_events', JSON.stringify(_sc));
+      } catch (_e) {}
+      sbUpsertEntry(entry);
     }
-    return;
+  } else {
+    m.classList.remove('open');
   }
-  const selType = document.querySelector('#qe-types .qe-type-btn.sel');
-  const wineType = selType ? selType.dataset.type : '赤ワイン';
-  const memo = memoEl ? memoEl.value.trim() : '';
+}
+window.closeQuickEntry = closeQuickEntry;
+
+function qeDoSave() {
+  const nameEl = document.getElementById('qe-name');
+  const memoEl = document.getElementById('qe-memo');
+  const wantEl = document.getElementById('qe-want-again');
+  const photoPreview = document.getElementById('qe-photo-preview');
+  const modal = document.getElementById('quick-modal');
+
+  const name = (nameEl ? nameEl.value : '').trim();
+  const memo = (memoEl ? memoEl.value : '').trim();
+  const wantAgain = (wantEl && !wantEl.checked) ? 'いいえ' : 'はい';
+  const photo = (photoPreview && photoPreview.classList.contains('has-photo')) ? photoPreview.src : '';
 
   const now = new Date();
   const days = ['日','月','火','水','木','金','土'];
+  const autoName = name || `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} のワイン`;
   const drinkDate = `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
 
-  const entry = {
-    id: Date.now().toString(),
-    createdAt: Date.now(),
-    wineName: name, vintage: '', producer: '', country: '', grape: '',
-    wineType, drinkDate, price: '', shop: '',
-    tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: memo,
-    rating: qeRating, wantAgain: 'はい', isFav: false, photo: '', aiComment: '', rawMemo: '',
-  };
+  const selType = document.querySelector('#qe-types .qe-type-btn.sel');
+  const wineType = selType ? selType.dataset.type : '赤ワイン';
+
+  const selChips = [];
+  document.querySelectorAll('#qe-detail-section .qe-type-btn.sel').forEach(b => {
+    if (b.dataset.chip) selChips.push(b.dataset.chip);
+  });
+  const detailText = selChips.length ? selChips.join('、') : '';
+  const finalMemo = detailText ? (memo ? `${memo}\n[${detailText}]` : `[${detailText}]`) : memo;
 
   const arr = loadData();
-  arr.unshift(entry);
-  const ok = saveData(arr);
-  closeQuickEntry();
-  if (ok) {
-    showEntry(entry.id);
-    showToast('✓ 保存しました');
-    // star_chart hook: R017ワインテイスティング自動点灯（クイック入力=常に新規）
-    try {
-      const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
-      _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-quick' });
-      localStorage.setItem('star_chart_events', JSON.stringify(_sc));
-    } catch (_e) {}
-    sbUpsertEntry(entry);
+  let entry;
+  const existingId = modal ? modal.dataset.currentId : null;
+
+  if (existingId) {
+    const idx = arr.findIndex(e => e.id === existingId);
+    if (idx >= 0) {
+      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo };
+      arr[idx] = entry;
+    }
   }
+
+  if (!entry) {
+    entry = {
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+      wineName: autoName, vintage: '', producer: '', country: '', grape: '',
+      wineType, drinkDate, price: '', shop: '',
+      tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: finalMemo,
+      rating: qeRating, wantAgain, isFav: false, photo, aiComment: '', rawMemo: '',
+    };
+    arr.unshift(entry);
+    if (modal) modal.dataset.currentId = entry.id;
+  }
+
+  saveData(arr);
+  return entry;
+}
+window.qeDoSave = qeDoSave;
+
+function saveQuickEntry() {
+  closeQuickEntry();
 }
 window.saveQuickEntry = saveQuickEntry;
+
+function qeHandlePhoto(inp) {
+  const file = inp.files[0];
+  if (!file) return;
+  compressImage(file).then(dataUrl => {
+    const preview = document.getElementById('qe-photo-preview');
+    const btn = document.querySelector('.qe-photo-btn');
+    if (preview) { preview.src = dataUrl; preview.classList.add('has-photo'); }
+    if (btn) btn.textContent = '📷 写真を変更';
+  }).catch(() => showToast('写真の処理に失敗しました')).finally(() => { inp.value = ''; });
+}
+window.qeHandlePhoto = qeHandlePhoto;
+
+function toggleQEDetail() {
+  const section = document.getElementById('qe-detail-section');
+  const btn = document.querySelector('.qe-detail-toggle');
+  if (!section) return;
+  const isOpen = section.classList.toggle('open');
+  if (btn) btn.textContent = isOpen ? '▲ 折りたたむ（試験対策）' : '▶ もっと詳しく書く（試験対策）';
+}
+window.toggleQEDetail = toggleQEDetail;
 
 // ══════════════════════════════════════════════════════
 // ① 試験対策テイスティングモード
@@ -1819,6 +1931,10 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('#qe-types .qe-type-btn').forEach(b => b.classList.remove('sel'));
       btn.classList.add('sel');
     });
+  });
+  // Quick Entry detail chips (toggle select)
+  document.querySelectorAll('#qe-detail-section .qe-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('sel'));
   });
   // Exam modal chip click delegation
   const examBody = document.querySelector('#exam-modal .ws-body');
@@ -2408,12 +2524,21 @@ window.importInbox = importInbox;
 <div id="quick-modal" class="wine-sheet" onclick="if(event.target===this)window.closeQuickEntry()">
   <div class="wine-sheet-inner">
     <div class="ws-header">
-      <div class="ws-title">⚡ クイック入力</div>
+      <div class="ws-title">🍷 テイスティングメモ</div>
       <button class="ws-close" onclick="window.closeQuickEntry()">✕</button>
     </div>
     <div class="ws-body">
-      <div class="qe-label">ワイン名</div>
+      <!-- ① ワイン名 -->
+      <div class="qe-label">ワイン名 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（空欄でも保存できます）</span></div>
       <input id="qe-name" class="qe-input" type="text" placeholder="例: シャトー・マルゴー 2018" autocomplete="off">
+      <!-- ② 写真 -->
+      <div class="qe-label">写真</div>
+      <div class="qe-photo-area">
+        <img id="qe-photo-preview" class="qe-photo-preview" alt="写真プレビュー">
+        <button class="qe-photo-btn" onclick="document.getElementById('qe-photo-inp').click()">📷 写真を追加</button>
+        <input id="qe-photo-inp" type="file" accept="image/*" capture="environment" style="display:none;" onchange="window.qeHandlePhoto(this)">
+      </div>
+      <!-- ③ ワインタイプ -->
       <div class="qe-label">タイプ</div>
       <div class="qe-type-row" id="qe-types">
         <button class="qe-type-btn sel" data-type="赤ワイン">🍷 赤</button>
@@ -2422,12 +2547,63 @@ window.importInbox = importInbox;
         <button class="qe-type-btn" data-type="スパークリング">✨ 泡</button>
         <button class="qe-type-btn" data-type="甘口">🍯 甘口</button>
       </div>
+      <!-- ④ 評価 -->
       <div class="qe-label">評価</div>
       <div id="qe-stars"></div>
-      <div class="qe-label">一言メモ</div>
-      <textarea id="qe-memo" class="qe-memo" placeholder="感想・ペアリングなど"></textarea>
-      <button class="qe-save" onclick="window.saveQuickEntry()">保存する</button>
-      <button onclick="window.closeQuickEntry();window.showInbox();" style="width:100%;margin-top:10px;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 メモから取り込む</button>
+      <!-- ⑤ テイスティングメモ -->
+      <div class="qe-label">テイスティングメモ</div>
+      <textarea id="qe-memo" class="qe-memo" style="height:110px;" placeholder="感じたことを何でも書いてください"></textarea>
+      <!-- ⑥ 試験対策チップ（折りたたみ） -->
+      <button class="qe-detail-toggle" onclick="window.toggleQEDetail()">▶ もっと詳しく書く（試験対策）</button>
+      <div id="qe-detail-section" class="qe-detail-section">
+        <div class="qe-label" style="color:#A9842A;margin-top:2px;">色・外観</div>
+        <div class="qe-type-row" style="flex-wrap:wrap;">
+          <button class="qe-type-btn" data-chip="紫がかった">紫がかった</button>
+          <button class="qe-type-btn" data-chip="ルビー">ルビー</button>
+          <button class="qe-type-btn" data-chip="ガーネット">ガーネット</button>
+          <button class="qe-type-btn" data-chip="麦わら色">麦わら色</button>
+          <button class="qe-type-btn" data-chip="ゴールド">ゴールド</button>
+          <button class="qe-type-btn" data-chip="色濃い">色濃い</button>
+          <button class="qe-type-btn" data-chip="色淡い">色淡い</button>
+        </div>
+        <div class="qe-label" style="color:#A9842A;">香り</div>
+        <div class="qe-type-row" style="flex-wrap:wrap;">
+          <button class="qe-type-btn" data-chip="ラズベリー">ラズベリー</button>
+          <button class="qe-type-btn" data-chip="チェリー">チェリー</button>
+          <button class="qe-type-btn" data-chip="カシス">カシス</button>
+          <button class="qe-type-btn" data-chip="プラム">プラム</button>
+          <button class="qe-type-btn" data-chip="リンゴ">リンゴ</button>
+          <button class="qe-type-btn" data-chip="桃">桃</button>
+          <button class="qe-type-btn" data-chip="バニラ">バニラ</button>
+          <button class="qe-type-btn" data-chip="樽">樽</button>
+          <button class="qe-type-btn" data-chip="ミネラル">ミネラル</button>
+          <button class="qe-type-btn" data-chip="香り強い">香り強い</button>
+          <button class="qe-type-btn" data-chip="香り弱い">香り弱い</button>
+        </div>
+        <div class="qe-label" style="color:#A9842A;">味わい</div>
+        <div class="qe-type-row" style="flex-wrap:wrap;">
+          <button class="qe-type-btn" data-chip="辛口">辛口</button>
+          <button class="qe-type-btn" data-chip="やや辛口">やや辛口</button>
+          <button class="qe-type-btn" data-chip="甘口">甘口</button>
+          <button class="qe-type-btn" data-chip="酸味強い">酸味強い</button>
+          <button class="qe-type-btn" data-chip="酸味中程度">酸味中程度</button>
+          <button class="qe-type-btn" data-chip="タンニン強い">タンニン強い</button>
+          <button class="qe-type-btn" data-chip="タンニン柔らか">タンニン柔らか</button>
+          <button class="qe-type-btn" data-chip="フルボディ">フルボディ</button>
+          <button class="qe-type-btn" data-chip="ミディアム">ミディアム</button>
+          <button class="qe-type-btn" data-chip="余韻長い">余韻長い</button>
+        </div>
+      </div>
+      <!-- ⑦ また飲みたい -->
+      <div class="qe-toggle-row">
+        <span class="qe-toggle-label">また飲みたい</span>
+        <label class="qe-toggle">
+          <input type="checkbox" id="qe-want-again" checked>
+          <span class="qe-toggle-slider"></span>
+        </label>
+      </div>
+      <!-- 📥 メモから取り込む -->
+      <button onclick="window.closeQuickEntry();window.showInbox();" style="width:100%;margin-top:6px;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 メモから取り込む</button>
     </div>
   </div>
 </div>
