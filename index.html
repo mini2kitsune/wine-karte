@@ -946,13 +946,11 @@ function enableChipEdit() {
   if (chipType) {
     chipType.style.cursor = 'pointer';
     chipType.addEventListener('click', () => {
-      const choice = prompt(
-        '種類を選択してください（番号入力）:\n' +
-        '1: 赤ワイン\n2: 白ワイン\n3: ロゼ\n4: スパークリング\n5: 甘口'
-      );
-      if (choice && /^[1-5]$/.test(choice.trim())) {
-        setChipFilled(chipType, WINE_TYPES[parseInt(choice.trim()) - 1]);
-      }
+      const cur = chipType.dataset.wnValue || chipType.innerText.trim();
+      openPicker('ワインの種類', WINE_TYPES, cur, val => {
+        setChipFilled(chipType, val);
+        if (typeof triggerAutoSave === 'function') triggerAutoSave();
+      });
     });
   }
 
