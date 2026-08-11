@@ -1674,7 +1674,7 @@ function reinitAll() {
   enableFooterNav();
   enableTastingEditButtons();
   // 自動保存: テキスト入力・contenteditable 変更を監視
-  document.querySelectorAll('[contenteditable="true"], textarea:not(#qe-memo):not(#ib-text)').forEach(el => {
+  document.querySelectorAll('[contenteditable="true"], textarea:not(#qe-look):not(#qe-aroma):not(#qe-flavor):not(#ib-text)').forEach(el => {
     if (!el.dataset.autoSaveWired) {
       el.addEventListener('input', triggerAutoSave);
       el.dataset.autoSaveWired = '1';
@@ -1809,14 +1809,13 @@ function showQuickEntry() {
   qeRating = 4;
   renderQEStars(4);
   const nameEl = document.getElementById('qe-name');
-  const memoEl = document.getElementById('qe-memo');
   const wantEl = document.getElementById('qe-want-again');
   const preview = document.getElementById('qe-photo-preview');
   const photoBtn = document.querySelector('.qe-photo-btn');
   const detailSection = document.getElementById('qe-detail-section');
   const detailToggle = document.querySelector('.qe-detail-toggle');
   if (nameEl) nameEl.value = '';
-  if (memoEl) memoEl.value = '';
+  ['qe-look','qe-aroma','qe-flavor'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   if (wantEl) wantEl.checked = true;
   if (preview) { preview.src = ''; preview.classList.remove('has-photo'); }
   if (photoBtn) photoBtn.textContent = '📷 写真を追加';
@@ -1842,10 +1841,9 @@ function closeQuickEntry() {
   const m = document.getElementById('quick-modal');
   if (!m) return;
   const nameEl = document.getElementById('qe-name');
-  const memoEl = document.getElementById('qe-memo');
   const name = (nameEl ? nameEl.value : '').trim();
-  const memo = (memoEl ? memoEl.value : '').trim();
-  if (name || memo || m.dataset.currentId) {
+  const hasMemo = ['qe-look','qe-aroma','qe-flavor'].some(id => { const el = document.getElementById(id); return el && el.value.trim(); });
+  if (name || hasMemo || m.dataset.currentId) {
     const entry = qeDoSave();
     m.classList.remove('open');
     if (entry) {
@@ -1866,13 +1864,14 @@ window.closeQuickEntry = closeQuickEntry;
 
 function qeDoSave() {
   const nameEl = document.getElementById('qe-name');
-  const memoEl = document.getElementById('qe-memo');
   const wantEl = document.getElementById('qe-want-again');
   const photoPreview = document.getElementById('qe-photo-preview');
   const modal = document.getElementById('quick-modal');
 
   const name = (nameEl ? nameEl.value : '').trim();
-  const memo = (memoEl ? memoEl.value : '').trim();
+  const look   = (document.getElementById('qe-look')   || {value:''}).value.trim();
+  const aroma  = (document.getElementById('qe-aroma')  || {value:''}).value.trim();
+  const flavor = (document.getElementById('qe-flavor') || {value:''}).value.trim();
   const wantAgain = (wantEl && !wantEl.checked) ? 'いいえ' : 'はい';
   const photo = (photoPreview && photoPreview.classList.contains('has-photo')) ? photoPreview.src : '';
 
@@ -1895,8 +1894,7 @@ function qeDoSave() {
   document.querySelectorAll('#qe-detail-section .qe-type-btn.sel').forEach(b => {
     if (b.dataset.chip) selChips.push(b.dataset.chip);
   });
-  const detailText = selChips.length ? selChips.join('、') : '';
-  const finalMemo = detailText ? (memo ? `${memo}\n[${detailText}]` : `[${detailText}]`) : memo;
+  const detailText = selChips.length ? `[${selChips.join('、')}]` : '';
 
   const arr = loadData();
   let entry;
@@ -1905,7 +1903,7 @@ function qeDoSave() {
   if (existingId) {
     const idx = arr.findIndex(e => e.id === existingId);
     if (idx >= 0) {
-      entry = { ...arr[idx], wineName: autoName, wineType, tasteMemo: finalMemo, rating: qeRating, wantAgain, photo, country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '', region: region || arr[idx].region || '' };
+      entry = { ...arr[idx], wineName: autoName, wineType, tasteLook: look || arr[idx].tasteLook || '', tasteAroma: aroma || arr[idx].tasteAroma || '', tasteFlavor: flavor || arr[idx].tasteFlavor || '', tasteMemo: detailText || arr[idx].tasteMemo || '', rating: qeRating, wantAgain, photo, country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '', region: region || arr[idx].region || '' };
       arr[idx] = entry;
     }
   }
@@ -1916,7 +1914,7 @@ function qeDoSave() {
       createdAt: Date.now(),
       wineName: autoName, vintage, producer: '', country, region, grape: '',
       wineType, drinkDate, price: '', shop: '',
-      tasteLook: '', tasteAroma: '', tasteFlavor: '', tasteMemo: finalMemo,
+      tasteLook: look, tasteAroma: aroma, tasteFlavor: flavor, tasteMemo: detailText,
       rating: qeRating, wantAgain, isFav: false, photo, aiComment: '', rawMemo: '',
     };
     arr.unshift(entry);
@@ -2696,7 +2694,12 @@ window.importInbox = importInbox;
       <div id="qe-stars"></div>
       <!-- ⑤ テイスティングメモ -->
       <div class="qe-label">テイスティングメモ</div>
-      <textarea id="qe-memo" class="qe-memo" style="height:110px;" placeholder="感じたことを何でも書いてください"></textarea>
+      <div style="font-size:12px;color:#9A8C7C;margin-bottom:5px;">👁 見た目</div>
+      <textarea id="qe-look" class="qe-memo" style="height:64px;margin-bottom:10px;" placeholder="色、透明感、輝き…"></textarea>
+      <div style="font-size:12px;color:#9A8C7C;margin-bottom:5px;">🌸 香り</div>
+      <textarea id="qe-aroma" class="qe-memo" style="height:64px;margin-bottom:10px;" placeholder="果実、花、スパイス…"></textarea>
+      <div style="font-size:12px;color:#9A8C7C;margin-bottom:5px;">✨ 味わい</div>
+      <textarea id="qe-flavor" class="qe-memo" style="height:64px;margin-bottom:4px;" placeholder="酸味、甘み、渋み、余韻…"></textarea>
       <!-- ⑥ 試験対策チップ（折りたたみ） -->
       <button class="qe-detail-toggle" onclick="window.toggleQEDetail()">▶ もっと詳しく書く（試験対策）</button>
       <div id="qe-detail-section" class="qe-detail-section">
