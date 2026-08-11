@@ -172,7 +172,6 @@ tailwind.config = {
         <dl style="display:flex;flex-direction:column;gap:13px;">
           <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">生産者</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">Château Margaux</dd></div>
           <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;cursor:pointer;">2018</dd></div>
-          <div class="flex items-center" style="gap:16px;font-size:16px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">地域</dt><dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">—</dd></div>
           <div class="flex items-center" style="gap:16px;font-size:16px;">
             <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>飲んだ日</dt>
             <dd class="text-ink font-medium" style="overflow:hidden;text-overflow:ellipsis;">2024 / 05 / 20 (月) 20:30</dd>
@@ -808,7 +807,7 @@ function initDOMTargets() {
   if (chips[2]) chips[2].id = 'v3-chip-grape';
 
   const dds = document.querySelectorAll('header ~ div .card dl dd');
-  const ddIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-region','v3-meta-date','v3-meta-price','v3-meta-shop'];
+  const ddIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop'];
   dds.forEach((dd, i) => { if (ddIds[i]) dd.id = ddIds[i]; });
 
   const tastingTexts = document.querySelectorAll('.card .text-ink[style*="font-size:24px"]');
@@ -838,7 +837,6 @@ function initDOMTargets() {
     'v3-wine-title':      'ワイン名を入力してください',
     'v3-meta-producer':   '—',
     'v3-meta-vintage':    '—',
-    'v3-meta-region':     '—',
     'v3-meta-date':       '未入力',
     'v3-meta-price':      '未入力',
     'v3-meta-shop':       '未入力',
@@ -915,12 +913,14 @@ function getCountryFlag(text) {
   return '';
 }
 
-// 国旗付きでチップを埋める
-function setCountryChipFilled(chip, text) {
+// 国旗付きでチップを埋める（region省略可）
+function setCountryChipFilled(chip, text, region) {
   if (!chip) return;
   const cleanText = text.replace(/^([\uD83C][\uDDE0-\uDDFF][\uD83C][\uDDE0-\uDDFF]\s*)+/, '').trim() || text;
-  chip.dataset.wnValue = cleanText;
-  // 既存の中身を全消し（SVG含む・絵文字に差し替えるため）
+  chip.dataset.wnValue   = cleanText;
+  chip.dataset.wnCountry = cleanText;
+  chip.dataset.wnRegion  = region || '';
+  const displayText = cleanText + (region ? ' / ' + region : '');
   [...chip.childNodes].forEach(n => n.remove());
   const flag = getCountryFlag(cleanText);
   if (flag) {
@@ -929,7 +929,7 @@ function setCountryChipFilled(chip, text) {
     flagSpan.textContent = flag;
     chip.appendChild(flagSpan);
   }
-  chip.appendChild(document.createTextNode(cleanText));
+  chip.appendChild(document.createTextNode(displayText));
   chip.style.borderStyle = '';
   chip.style.borderColor = '';
   chip.style.color = '';
@@ -1006,7 +1006,7 @@ function showGrapeDialog(currentValue) {
 
 // ── Inline Edit ───────────────────────────────────────────────────────────────
 function enableInlineEdit() {
-  const ids = ['v3-wine-title','v3-meta-producer','v3-meta-region',
+  const ids = ['v3-wine-title','v3-meta-producer',
     'v3-meta-price','v3-meta-shop','v3-taste-look','v3-taste-aroma',
     'v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
   ids.forEach(id => {
@@ -1224,8 +1224,8 @@ function collectCurrentEntry() {
     wineName,
     vintage,
     producer:    getText('v3-meta-producer'),
-    country:     getChipText('v3-chip-country', '産地を入力'),
-    region:      getText('v3-meta-region'),
+    country:     (() => { const c = document.getElementById('v3-chip-country'); return c ? (c.dataset.wnCountry || c.dataset.wnValue || '') : ''; })(),
+    region:      (() => { const c = document.getElementById('v3-chip-country'); return c ? (c.dataset.wnRegion || '') : ''; })(),
     grape:       getChipText('v3-chip-grape',   '品種を入力'),
     wineType:    getChipText('v3-chip-type',    '種類を選択'),
     drinkDate:   getText('v3-meta-date'),
@@ -1264,7 +1264,6 @@ function fillEntry(entry) {
   }
   setText('v3-meta-producer', entry.producer);
   setText('v3-meta-vintage',  entry.vintage);
-  setText('v3-meta-region',   entry.region);
   setText('v3-meta-date',     entry.drinkDate);
   setText('v3-meta-price',    entry.price);
   setText('v3-meta-shop',     entry.shop);
@@ -1299,7 +1298,7 @@ function fillEntry(entry) {
     else setChipEmpty(chipType, '種類を選択');
   }
   if (chipCountry) {
-    if (entry.country && entry.country !== '産地を入力') setCountryChipFilled(chipCountry, entry.country);
+    if (entry.country && entry.country !== '産地を入力') setCountryChipFilled(chipCountry, entry.country, entry.region || '');
     else setChipEmpty(chipCountry, '産地を入力');
   }
   if (chipGrape) {
@@ -1571,7 +1570,7 @@ function showNew() {
     if (spanEl) spanEl.textContent = '';
   }
 
-  const clearIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-region','v3-meta-date','v3-meta-price','v3-meta-shop',
+  const clearIds = ['v3-meta-producer','v3-meta-vintage','v3-meta-date','v3-meta-price','v3-meta-shop',
     'v3-taste-look','v3-taste-aroma','v3-taste-flavor','v3-taste-memo','v3-ai-comment'];
   clearIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerText = ''; });
 
@@ -1756,11 +1755,37 @@ function openVintagePicker(context) {
 }
 function openCountryPickerDetail() {
   const chip = document.getElementById('v3-chip-country');
-  const cur = PICKER_COUNTRIES.find(c => chip && chip.innerText.includes(c)) || '';
+  const cur = chip ? (chip.dataset.wnCountry || chip.dataset.wnValue || '') : '';
   openPicker('産地（国）', PICKER_COUNTRIES, cur, val => {
-    if (chip) setCountryChipFilled(chip, val);
-    if (typeof triggerAutoSave === 'function') triggerAutoSave();
+    const curRegion = chip ? (chip.dataset.wnRegion || '') : '';
+    showRegionInputDetail(val, curRegion);
   });
+}
+function showRegionInputDetail(country, currentRegion) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(20,10,12,.55);z-index:10001;display:flex;align-items:flex-end;justify-content:center;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#FAF6EF;border-radius:24px 24px 0 0;padding:24px 24px 36px;width:100%;max-width:520px;box-sizing:border-box;';
+  box.innerHTML =
+    '<div style="font-size:18px;color:#3D070F;font-weight:600;margin-bottom:4px;">地域・産地（任意）</div>' +
+    '<div style="font-size:13px;color:#9A8C7C;margin-bottom:14px;">例: ブルゴーニュ、カリフォルニア など。空欄でもOKです。</div>' +
+    '<input type="text" placeholder="地域を入力" style="width:100%;border:1.5px solid #DDD5C5;border-radius:10px;padding:12px 14px;font-size:16px;font-family:\'Noto Serif JP\',serif;color:#3D070F;background:#fff;box-sizing:border-box;outline:none;margin-bottom:14px;">' +
+    '<button style="width:100%;background:#5B0E1A;color:#FAF6EF;border:none;border-radius:12px;padding:14px;font-size:16px;font-family:\'Noto Serif JP\',serif;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">完了</button>';
+  const inp = box.querySelector('input');
+  const btn = box.querySelector('button');
+  inp.value = currentRegion || '';
+  const done = () => {
+    const chip = document.getElementById('v3-chip-country');
+    setCountryChipFilled(chip, country, inp.value.trim());
+    if (typeof triggerAutoSave === 'function') triggerAutoSave();
+    document.body.removeChild(overlay);
+  };
+  btn.addEventListener('click', done);
+  overlay.addEventListener('click', e => { if (e.target === overlay) done(); });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); done(); } });
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => inp.focus(), 150);
 }
 window.closePicker = closePicker;
 window.selectPickerItem = selectPickerItem;
