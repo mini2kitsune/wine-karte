@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: #1a0d11;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer components {
+  /* Decorative gradients & effects that mirror the design 1:1.
+     Kept here because radial-gradients / clip-paths are clearer than long
+     arbitrary Tailwind values. */
+  .stage {
+    background: radial-gradient(
+      1200px 600px at 50% -10%,
+      #3a1c22 0%,
+      #241115 60%,
+      #1a0d11 100%
+    );
+  }
+  .hd-grad {
+    background: radial-gradient(
+      120% 140% at 50% -30%,
+      #6e1320 0%,
+      #5b0e1a 45%,
+      #3d070f 100%
+    );
+  }
+  .ai-grad {
+    background: linear-gradient(180deg, #fbf4e6, #f6ecd8);
+  }
+  .fav-grad {
+    background: linear-gradient(180deg, #e2bb55, #cfa23c);
+  }
+  .fav-notch {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%);
+  }
+  .seal-sh {
+    filter: drop-shadow(0 4px 7px rgba(80, 20, 20, 0.3));
+  }
+  .tt-shadow {
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+  }
+}

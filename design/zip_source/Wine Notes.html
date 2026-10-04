@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine Notes — design preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Utility CSS (Tailwind replacement) ───────────────── */
+*,*::before,*::after{box-sizing:border-box;}
+/* display */
+.flex{display:flex;}.inline-flex{display:inline-flex;}
+/* direction */
+.flex-col{flex-direction:column;}
+/* wrap */
+.flex-wrap{flex-wrap:wrap;}.flex-nowrap{flex-wrap:nowrap;}
+/* align */
+.items-center{align-items:center;}.items-end{align-items:flex-end;}.items-start{align-items:flex-start;}
+.justify-center{justify-content:center;}.justify-start{justify-content:flex-start;}
+.self-center{align-self:center;}.self-end{align-self:flex-end;}.self-stretch{align-self:stretch;}
+.content-end{align-content:flex-end;}
+/* flex sizing */
+.flex-1{flex:1 1 0%;}.shrink-0{flex-shrink:0;}.min-w-0{min-width:0;}
+/* sizing */
+.w-full{width:100%;}.h-full{height:100%;}
+/* position */
+.relative{position:relative;}.absolute{position:absolute;}
+/* text */
+.text-center{text-align:center;}.text-left{text-align:left;}
+.whitespace-nowrap{white-space:nowrap;}
+.italic{font-style:italic;}
+/* font weight */
+.font-bold{font-weight:700;}.font-semibold{font-weight:600;}.font-medium{font-weight:500;}.font-normal{font-weight:400;}
+/* font family */
+.font-jp{font-family:'Noto Serif JP','Yu Mincho',serif;}
+.font-pf{font-family:'Playfair Display',serif;}
+.font-script{font-family:'Great Vibes',cursive;}
+/* overflow */
+.overflow-hidden{overflow:hidden;}
+/* margin */
+.ml-auto{margin-left:auto;}
+/* border */
+.border{border-width:1px;border-style:solid;}
+.border-t{border-top-width:1px;border-top-style:solid;}
+.border-l{border-left-width:1px;border-left-style:solid;}
+.border-dashed{border-style:dashed;}
+.rounded-full{border-radius:9999px;}
+/* colors — text */
+.text-white{color:#fff;}
+.text-ink{color:#4A3F35;}.text-ink-soft{color:#6B5B4B;}.text-ink-mute{color:#9A8C7C;}
+.text-gold{color:#D4AF37;}.text-gold-deep{color:#A9842A;}
+.text-bordeaux-soft{color:#7A1322;}
+/* colors — bg */
+.bg-white{background:#fff;}.bg-ivory{background:#FAF6EF;}
+.bg-bordeaux{background:#5B0E1A;}
+.bg-hair{background:#E7DECB;}
+/* colors — border */
+.border-hair{border-color:#E7DECB;}
+.border-bordeaux{border-color:#5B0E1A;}
+.border-transparent{border-color:transparent;}
+/* arbitrary colors used in file */
+.text-\[\#e8d2a0\]\/90{color:rgba(232,210,160,.9);}
+.text-\[\#E9C766\]{color:#E9C766;}
+.text-\[\#C9A24A\]{color:#C9A24A;}
+.text-\[\#241015\]{color:#241015;}
+.text-\[\#3a1118\]{color:#3a1118;}
+.text-\[\#2c1116\]{color:#2c1116;}
+.text-\[\#D8C9A8\]{color:#D8C9A8;}
+.border-\[\#D8C9A8\]{border-color:#D8C9A8;}
+.bg-white\/15{background:rgba(255,255,255,.15);}
+.bg-white\/60{background:rgba(255,255,255,.6);}
+/* ── Brand CSS ─────────────────────────────────────────── */
+body{margin:0;overflow:hidden;background:#1a0d11;-webkit-font-smoothing:antialiased;}
+.stage{display:flex;align-items:center;justify-content:center;width:100vw;height:100vh;overflow:hidden;padding:28px;box-sizing:border-box;background:radial-gradient(1200px 600px at 50% -10%,#3a1c22 0%,#241115 60%,#1a0d11 100%);}
+.hd{background:radial-gradient(120% 140% at 50% -30%,#6e1320 0%,#5B0E1A 45%,#3D070F 100%);}
+.ai-bg{background:linear-gradient(180deg,#FBF4E6,#F6ECD8);}
+.fav-bg{background:linear-gradient(180deg,#E2BB55,#CFA23C);}
+.fav-notch{clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);}
+.seal-sh{filter:drop-shadow(0 4px 8px rgba(80,20,20,.25));}
+.tt-sh{text-shadow:0 2px 12px rgba(0,0,0,.38);}
+.card{background:#fff;border:1px solid #E7DECB;box-shadow:0 14px 40px rgba(60,30,20,.10),0 3px 10px rgba(60,30,20,.05);}
+/* Bundler thumbnail */
+</style>
+<template id="__bundler_thumbnail" data-bg-color="#1a0d11">
+  <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="600" fill="#1a0d11"/>
+    <rect x="60" y="30" width="280" height="540" rx="40" fill="#FAF6EF"/>
+    <rect x="60" y="30" width="280" height="90" rx="40" fill="#5B0E1A"/>
+    <rect x="60" y="90" width="280" height="30" fill="#5B0E1A"/>
+    <circle cx="200" cy="56" r="10" fill="#D4AF37" opacity=".8"/>
+    <rect x="120" y="72" width="160" height="14" rx="7" fill="#E9C766" opacity=".85"/>
+    <rect x="80" y="140" width="110" height="130" rx="12" fill="#C49B3A" opacity=".4"/>
+    <rect x="205" y="148" width="120" height="14" rx="4" fill="#241015" opacity=".5"/>
+    <rect x="205" y="170" width="90" height="10" rx="4" fill="#9A8C7C" opacity=".4"/>
+    <rect x="205" y="188" width="100" height="10" rx="4" fill="#9A8C7C" opacity=".35"/>
+    <rect x="205" y="206" width="80" height="10" rx="4" fill="#9A8C7C" opacity=".35"/>
+    <rect x="80" y="292" width="214" height="64" rx="16" fill="white" opacity=".85"/>
+    <text x="92" y="324" font-size="22" fill="#D4AF37">★★★★☆</text>
+    <rect x="304" y="284" width="40" height="76" rx="8" fill="#D4AF37"/>
+    <text x="324" y="326" font-size="20" fill="white" text-anchor="middle">♥</text>
+    <rect x="80" y="370" width="260" height="130" rx="16" fill="white" opacity=".85"/>
+    <circle cx="116" cy="396" r="20" fill="#7A1322" opacity=".75"/>
+    <rect x="148" y="388" width="80" height="12" rx="4" fill="#2c1116" opacity=".5"/>
+    <circle cx="116" cy="438" r="20" fill="#7A1322" opacity=".75"/>
+    <rect x="148" y="430" width="80" height="12" rx="4" fill="#2c1116" opacity=".5"/>
+    <rect x="80" y="514" width="260" height="56" rx="14" fill="#FBF4E6" opacity=".9"/>
+    <rect x="100" y="526" width="120" height="12" rx="4" fill="#2c1116" opacity=".5"/>
+    <rect x="100" y="545" width="160" height="10" rx="4" fill="#9A8C7C" opacity=".4"/>
+  </svg>
+</template>
+</head>
+<body class="font-jp">
+<div class="stage">
+<div id="scaler" style="width:1024px;flex:0 0 1024px;">
+
+<!-- ════ PHONE ════ -->
+<div class="w-full bg-ivory" style="border-radius:72px;overflow:hidden;box-shadow:0 60px 140px rgba(0,0,0,.55),0 0 0 16px #0e0709,0 0 0 20px #2a1a1d;">
+
+  <!-- HEADER — target 120px -->
+  <header class="hd relative text-center" style="padding:24px 20px 20px;">
+    <button class="absolute flex items-center justify-center text-[#e8d2a0]/90" style="left:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;">
+      <svg viewBox="0 0 24 24" style="width:40px;height:40px;" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <div class="flex flex-col items-center" style="gap:2px;">
+      <img src="assets/grape_gold.png" alt="" style="width:48px;margin-bottom:-4px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));">
+      <div class="tt-sh font-script text-[#E9C766] flex items-center whitespace-nowrap" style="font-size:68px;line-height:1;gap:18px;">
+        <span class="font-pf italic text-[#C9A24A]" style="font-size:46px;">~</span>Wine Notes<span class="font-pf italic text-[#C9A24A]" style="font-size:46px;">~</span>
+      </div>
+    </div>
+    <button class="absolute flex items-center justify-center text-[#e8d2a0]/90" style="right:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;">
+      <svg viewBox="0 0 24 24" style="width:40px;height:40px;" fill="currentColor"><circle cx="5" cy="12" r="3.2"></circle><circle cx="12" cy="12" r="3.2"></circle><circle cx="19" cy="12" r="3.2"></circle></svg>
+    </button>
+  </header>
+
+  <!-- WINE INFO CARD — target 395px total including mt -->
+  <div style="padding:0 18px;margin-top:14px;">
+    <div class="card flex" style="border-radius:36px;gap:16px;padding:20px;">
+      <!-- Photo -->
+      <div class="relative shrink-0" style="width:300px;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(40,15,10,.25);align-self:stretch;">
+        <img src="assets/wine_photo.png" alt="Château Margaux 2018" style="display:block;width:100%;height:100%;object-fit:cover;">
+        <button class="absolute flex items-center justify-center text-gold" style="right:12px;bottom:12px;width:60px;height:60px;border-radius:50%;background:rgba(30,12,10,.80);border:2px solid #D4AF37;">
+          <svg viewBox="0 0 24 24" style="width:30px;height:30px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+        </button>
+      </div>
+      <!-- Info -->
+      <div class="flex-1 min-w-0" style="padding-top:4px;">
+        <h1 class="font-pf text-[#241015]" style="font-size:40px;font-weight:600;line-height:1.18;margin-bottom:14px;">
+          Château Margaux <span style="font-size:32px;font-weight:500;">2018</span>
+        </h1>
+        <!-- Chips -->
+        <div class="flex flex-wrap" style="gap:8px;margin-bottom:14px;">
+          <span class="inline-flex items-center border border-hair bg-white rounded-full text-ink-soft whitespace-nowrap" style="gap:6px;padding:7px 13px;font-size:24px;">
+            <svg viewBox="0 0 24 24" style="width:24px;height:24px;flex-shrink:0;" fill="none" stroke="#7A1322" stroke-width="1.6"><path d="M8 3h8l-.5 6a3.5 3.5 0 0 1-7 0L8 3z"></path><line x1="12" y1="12.5" x2="12" y2="20"></line><line x1="8.5" y1="20.5" x2="15.5" y2="20.5"></line></svg>赤ワイン</span>
+          <span class="inline-flex items-center border border-hair bg-white rounded-full text-ink-soft whitespace-nowrap" style="gap:6px;padding:7px 13px;font-size:24px;">
+            <span style="width:24px;height:24px;flex-shrink:0;border-radius:3px;overflow:hidden;display:inline-flex;"><svg viewBox="0 0 24 16" style="width:100%;height:100%;"><rect width="8" height="16" fill="#0A2A6B"></rect><rect x="8" width="8" height="16" fill="#fff"></rect><rect x="16" width="8" height="16" fill="#C8102E"></rect></svg></span>フランス / ボルドー</span>
+          <span class="inline-flex items-center border border-hair bg-white rounded-full text-ink-soft whitespace-nowrap" style="gap:6px;padding:7px 13px;font-size:24px;">
+            <svg viewBox="0 0 24 24" style="width:24px;height:24px;flex-shrink:0;" fill="none" stroke="#7A1322" stroke-width="1.5"><circle cx="9" cy="14" r="2.4"></circle><circle cx="14.5" cy="14" r="2.4"></circle><circle cx="11.7" cy="18" r="2.4"></circle><path d="M12 9c0-2 1.5-3.5 3.5-3.5"></path></svg>カベルネ・S 他</span>
+        </div>
+        <!-- Meta -->
+        <dl style="display:flex;flex-direction:column;gap:13px;">
+          <div class="flex items-center" style="gap:16px;font-size:26px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">生産者</dt><dd class="text-ink font-medium whitespace-nowrap">Château Margaux</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:26px;"><dt class="text-ink-mute shrink-0" style="min-width:120px;">ヴィンテージ</dt><dd class="text-ink font-medium whitespace-nowrap">2018</dd></div>
+          <div class="flex items-center" style="gap:16px;font-size:26px;">
+            <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>飲んだ日</dt>
+            <dd class="text-ink font-medium whitespace-nowrap">2024 / 05 / 20 (月) 20:30</dd>
+          </div>
+          <div class="flex items-center" style="gap:16px;font-size:26px;">
+            <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 12.2V4a1 1 0 0 1 1-1h8.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8z"></path><circle cx="8" cy="8" r="1.4"></circle></svg>購入価格</dt>
+            <dd class="text-ink font-medium whitespace-nowrap">¥45,000</dd>
+          </div>
+          <div class="flex items-center" style="gap:16px;font-size:26px;">
+            <dt class="text-ink-mute shrink-0 flex items-center" style="gap:7px;min-width:120px;"><svg viewBox="0 0 24 24" style="width:28px;height:28px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle><path d="M2 3h3l2.4 12.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.2L22 7H6"></path></svg>購入場所</dt>
+            <dd class="text-ink font-medium whitespace-nowrap">○○ワインショップ</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVALUATION — target 165px total -->
+  <div style="padding:0 18px;margin-top:14px;">
+    <div class="flex items-center" style="gap:16px;">
+      <div class="card flex-1 flex items-center" style="border-radius:36px;padding:16px 18px;gap:8px;min-width:0;overflow:hidden;">
+        <!-- Rating -->
+        <div class="flex flex-col items-center" style="flex:1;min-width:0;">
+          <div class="text-ink-mute whitespace-nowrap" style="font-size:22px;margin-bottom:10px;">総合評価</div>
+          <div class="flex" style="gap:3px;" id="stars"></div>
+          <div class="font-pf text-[#3a1118] font-semibold" style="font-size:34px;margin-top:8px;">
+            4.5 <span class="text-ink-mute font-normal" style="font-size:22px;">/ 5.0</span>
+          </div>
+        </div>
+        <!-- Divider -->
+        <div class="self-stretch border-l border-dashed border-[#D8C9A8]" style="margin:8px;flex-shrink:0;"></div>
+        <!-- Likert -->
+        <div class="flex flex-col items-center" style="flex:2;min-width:0;">
+          <div class="text-ink-mute whitespace-nowrap" style="font-size:22px;margin-bottom:10px;">また飲みたい？</div>
+          <div class="flex flex-nowrap" style="gap:8px;" id="likert">
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-bordeaux border-bordeaux text-white" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="1">
+              <span class="rounded-full flex items-center justify-center bg-white/15 border border-transparent" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.6 5.5 5.7 5.5c1.9 0 3.2 1.1 4.3 2.6 1.1-1.5 2.4-2.6 4.3-2.6 3.1 0 4.8 3.1 3.3 6.4C19.5 16.4 12 21 12 21z"></path></svg></span>はい</button>
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="0">
+              <span class="rounded-full flex items-center justify-center border border-hair" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><line x1="8" y1="14.5" x2="16" y2="14.5"></line><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>どちらでも</button>
+            <button class="opt flex items-center border rounded-full whitespace-nowrap bg-white border-hair text-ink-soft" style="gap:8px;padding:10px 12px 10px 8px;font-size:22px;" data-on="0">
+              <span class="rounded-full flex items-center justify-center border border-hair" style="width:32px;height:32px;flex-shrink:0;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"></circle><path d="M8 16c1-1.6 2.4-2.4 4-2.4S15 14.4 16 16"></path><circle cx="8.5" cy="9.5" r="1"></circle><circle cx="15.5" cy="9.5" r="1"></circle></svg></span>いいえ</button>
+          </div>
+        </div>
+      </div>
+      <!-- Fav bookmark -->
+      <button id="favTab" class="fav-bg fav-notch shrink-0 flex flex-col items-center justify-start text-white" style="width:130px;height:165px;border-radius:14px 14px 0 0;padding-top:22px;gap:14px;box-shadow:0 8px 20px rgba(120,90,20,.3);">
+        <span style="font-size:46px;line-height:1;">♥</span>
+        <span style="font-size:17px;letter-spacing:1px;writing-mode:horizontal-tb;text-align:center;line-height:1;white-space:nowrap;">お気に入り</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TASTING -->
+  <div style="padding:0 30px;margin-top:10px;">
+    <div class="card" style="border-radius:22px;padding:0 4px;">
+
+      <div class="flex items-end" style="gap:10px;padding:6px 10px 10px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
+          <img src="assets/seal_look.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+          <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">見た目</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-gold-deep" style="font-size:20px;margin-bottom:6px;letter-spacing:.3px;">色合い・濃淡・透明感・粘性 など</div>
+          <div class="text-ink" style="font-size:24px;line-height:1.55;">深いガーネット。エッジにわずかに紫。粘性はやや強め。</div>
+        </div>
+        <button class="border border-hair bg-white text-ink-mute flex items-center justify-center shrink-0" style="width:56px;height:56px;border-radius:50%;"><svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+      </div>
+
+      <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
+          <img src="assets/seal_aroma.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+          <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">香り</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-gold-deep" style="font-size:20px;margin-bottom:6px;letter-spacing:.3px;">第一印象・香りの特徴 など</div>
+          <div class="text-ink" style="font-size:24px;line-height:1.55;">カシス、ブラックチェリー、杉、バニラ、スミレのニュアンス。</div>
+        </div>
+        <button class="border border-hair bg-white text-ink-mute flex items-center justify-center shrink-0" style="width:56px;height:56px;border-radius:50%;"><svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+      </div>
+
+      <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
+          <img src="assets/seal_taste.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+          <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">味わい</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-gold-deep" style="font-size:20px;margin-bottom:6px;letter-spacing:.3px;">甘辛・酸味・渋み・アルコール・余韻 など</div>
+          <div class="text-ink" style="font-size:24px;line-height:1.55;">しっかりしたタンニンと豊かな果実味。酸味のバランスがよく、長い余韻が心地よい。</div>
+        </div>
+        <button class="border border-hair bg-white text-ink-mute flex items-center justify-center shrink-0" style="width:56px;height:56px;border-radius:50%;"><svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+      </div>
+
+      <div class="flex items-end border-t border-hair" style="gap:10px;padding:6px 10px 10px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;width:310px;">
+          <img src="assets/seal_memo.png" alt="" class="seal-sh" style="width:150px;height:150px;object-fit:contain;flex-shrink:0;">
+          <div style="font-size:24px;color:#2c1116;font-weight:600;line-height:1.2;white-space:nowrap;">一言メモ</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-gold-deep" style="font-size:20px;margin-bottom:6px;letter-spacing:.3px;">ペアリング・シーンなど自由にメモ</div>
+          <div class="text-ink" style="font-size:24px;line-height:1.55;">牛ステーキと合わせたら最高！特別な日にまた飲みたい一本。</div>
+        </div>
+        <button class="border border-hair bg-white text-ink-mute flex items-center justify-center shrink-0" style="width:56px;height:56px;border-radius:50%;"><svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS — target 120px -->
+  <div style="padding:0 18px;margin-top:14px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
+        <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none" stroke="#A9842A" stroke-width="1.6"><rect x="8" y="2.5" width="8" height="4" rx="1.2"></rect><rect x="5" y="4.5" width="14" height="18" rx="2.4"></rect><line x1="8.5" y1="11" x2="15.5" y2="11"></line><line x1="8.5" y1="15" x2="13.5" y2="15"></line></svg></span>
+        <span class="flex flex-col" style="gap:4px;">
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">テイスティングコメントをコピー</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">カルテの内容をコピー</span>
+        </span>
+      </button>
+      <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
+        <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#C13584" stroke-width="1.8"></rect><circle cx="12" cy="12" r="4.2" stroke="#C13584" stroke-width="1.8"></circle><circle cx="17.3" cy="6.7" r="1.2" fill="#C13584"></circle></svg></span>
+        <span class="flex flex-col" style="gap:4px;">
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">Instagram投稿用に整形</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">見やすく・映える文章に変換</span>
+        </span>
+      </button>
+      <button class="card flex items-center text-left" style="border-radius:26px;padding:16px 18px;gap:16px;">
+        <span style="width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none" stroke="#7A1322" stroke-width="1.7"><path d="M12 16V4"></path><path d="M8 8l4-4 4 4"></path><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg></span>
+        <span class="flex flex-col" style="gap:4px;">
+          <span class="text-[#2c1116] font-semibold" style="font-size:15px;line-height:1.3;white-space:nowrap;">シェアする</span>
+          <span class="text-ink-mute" style="font-size:13px;line-height:1.3;white-space:nowrap;">画像として共有</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- AI SOMMELIER -->
+  <div style="padding:0 18px;margin-top:14px;">
+    <div class="ai-bg flex items-center" style="border:1px solid #EAD9B4;border-radius:36px;padding:24px;gap:24px;box-shadow:0 14px 40px rgba(60,30,20,.10),0 3px 10px rgba(60,30,20,.05);">
+      <!-- Cat left -->
+      <div style="width:210px;flex-shrink:0;align-self:flex-end;">
+        <img src="assets/cat_full.png" alt="猫ソムリエ ピノ" style="display:block;width:100%;mix-blend-mode:multiply;">
+      </div>
+      <!-- Text right -->
+      <div class="flex-1 min-w-0 flex flex-col" style="gap:14px;">
+        <div class="flex items-center" style="gap:14px;">
+          <span class="flex items-center justify-center shrink-0" style="width:52px;height:52px;">
+            <img src="assets/wineglass_t.png" alt="wine glass" style="width:40px;height:40px;object-fit:contain;">
+          </span>
+          <span class="font-jp font-bold text-[#2c1116]" style="font-size:28px;line-height:1.3;">AIソムリエからの一言</span>
+          <!-- decorative gold leaf from brand -->
+          <img src="assets/gold_leaf.png" alt="" style="width:40px;height:40px;flex-shrink:0;object-fit:contain;mix-blend-mode:multiply;">
+        </div>
+        <p class="text-ink" style="font-size:22px;line-height:1.8;">香りの表現がとても素敵です。特に<span class="text-bordeaux-soft font-semibold">「杉やバニラ」</span>というニュアンスは、このワインの樽熟による特徴をよく捉えていますね。力強さとエレガンスが共存する、素晴らしい一本を楽しまれたようです 🍷</p>
+        <!-- AI tags -->
+        <div class="flex flex-wrap" style="gap:10px;">
+          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">カシス系果実</span>
+          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">樽のニュアンス</span>
+          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">バランスが良い</span>
+          <span style="border:1px solid #E0CFA6;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 18px;font-size:20px;color:#6B5B4B;white-space:nowrap;">長い余韻</span>
+        </div>
+    </div>
+  </div>
+
+  <!-- FOOTER — target 45px -->
+  <nav class="flex items-center border-t border-hair bg-ivory" style="padding:10px 14px;margin-top:14px;">
+    <button class="flex-1 flex items-center justify-center text-ink-soft" style="gap:10px;font-size:24px;">
+      <svg viewBox="0 0 24 24" style="width:30px;height:30px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>前のワイン</button>
+    <div class="bg-hair" style="width:1px;height:36px;"></div>
+    <button class="flex-1 flex items-center justify-center font-semibold text-[#2c1116]" style="gap:10px;font-size:24px;">
+      <svg viewBox="0 0 24 24" style="width:30px;height:30px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="17" rx="2.5"></rect><line x1="3" y1="9.5" x2="21" y2="9.5"></line><line x1="8" y1="2.5" x2="8" y2="6.5"></line><line x1="16" y1="2.5" x2="16" y2="6.5"></line></svg>ワイン一覧に戻る</button>
+    <div class="bg-hair" style="width:1px;height:36px;"></div>
+    <button class="flex-1 flex items-center justify-center text-ink-soft" style="gap:10px;font-size:24px;">
+      次のワイン<svg viewBox="0 0 24 24" style="width:30px;height:30px;" class="text-gold-deep" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </nav>
+
+  <div style="height:14px;"></div>
+</div><!-- /phone -->
+</div><!-- /scaler -->
+</div><!-- /stage -->
+
+<script>
+// Stars 4.5
+(function(){
+  var w=document.getElementById('stars'),html='';
+  var path='<path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z"/>';
+  var sz='style="width:46px;height:46px;"';
+  for(var i=0;i<5;i++){
+    if(i<4) html+='<svg viewBox="0 0 24 24" '+sz+' fill="#D4AF37">'+path+'</svg>';
+    else html+='<svg viewBox="0 0 24 24" '+sz+'><defs><linearGradient id="hg"><stop offset="50%" stop-color="#D4AF37"/><stop offset="50%" stop-color="#E2D7BE"/></linearGradient></defs><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.8 6.1 20.5l1.2-6.5L2.5 9.4 9.1 8.5z" fill="url(#hg)"/></svg>';
+  }
+  w.innerHTML=html;
+})();
+
+// Likert
+document.querySelectorAll('#likert .opt').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#likert .opt').forEach(function(x){
+      x.classList.remove('bg-bordeaux','border-bordeaux','text-white');
+      x.classList.add('bg-white','border-hair','text-ink-soft');
+    });
+    b.classList.remove('bg-white','border-hair','text-ink-soft');
+    b.classList.add('bg-bordeaux','border-bordeaux','text-white');
+  });
+});
+
+// Zoom to fit — height-aware with minimum width-based floor
+var _nh=0;
+var PAD=28*2;
+function fitPhone(){
+  var sc=document.getElementById('scaler');
+  sc.style.zoom=1;
+  if(!_nh) _nh=sc.offsetHeight;
+  var zW=(window.innerWidth-PAD)/1024;
+  var zH=(window.innerHeight-PAD)/_nh;
+  sc.style.zoom=Math.min(zW,zH)*0.97;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  fitPhone();
+  if(document.fonts) document.fonts.ready.then(function(){_nh=0;fitPhone();});
+});
+window.addEventListener('resize',fitPhone);
+</script>
+</body>
+</html>
