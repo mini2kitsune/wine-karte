@@ -130,7 +130,7 @@ tailwind.config = {
 
   <!-- HEADER — target 120px -->
   <header class="hd relative text-center" style="padding:24px 20px 20px;">
-    <button class="absolute flex items-center justify-center text-[#e8d2a0]/90" style="left:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;">
+    <button type="button" aria-label="ワイン一覧に戻る" title="ワイン一覧に戻る" class="absolute flex items-center justify-center text-[#e8d2a0]/90" style="left:24px;top:50%;transform:translateY(-50%);width:58px;height:58px;">
       <svg viewBox="0 0 24 24" style="width:40px;height:40px;" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
     </button>
     <div class="flex flex-col items-center" style="gap:2px;">
@@ -465,6 +465,10 @@ window.addEventListener('resize',fitPhone);
     }
     /* hide in-phone nav on mobile — replaced by fixed bottom nav (#m-bottom-nav) */
     #in-phone-nav { display: none !important; }
+
+    /* 評価欄は横幅が限られるため、星を縮めてカード内に収める */
+    #stars { gap: 1px !important; }
+    #stars svg { width: 32px !important; height: 32px !important; }
   }
 
   /* Fixed bottom nav — mobile only, lives outside scaler to escape transform */
@@ -589,6 +593,7 @@ window.addEventListener('resize',fitPhone);
     color: #6B5B4B;
   }
   .ws-body { overflow-y: auto; padding: 16px 20px calc(20px + env(safe-area-inset-bottom)); flex: 1; }
+  .ws-footer { flex-shrink: 0; padding: 10px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid #E7DECB; background: #FAF6EF; }
   /* ④ Quick Entry */
   .qe-label { font-size: 12px; color: #9A8C7C; font-weight: 700; letter-spacing: .4px; margin-bottom: 6px; }
   .qe-input {
@@ -657,6 +662,8 @@ window.addEventListener('resize',fitPhone);
     color: #9A8C7C; cursor: pointer; text-align: center; margin-bottom: 10px;
     -webkit-tap-highlight-color: transparent;
   }
+  .qe-extra-section { display: none; padding: 12px; margin: -2px 0 14px; background: #FBF8F1; border: 1px solid #E7DECB; border-radius: 12px; }
+  .qe-extra-section.open { display: block; }
   .qe-detail-section { display: none; margin-bottom: 6px; }
   .qe-detail-section.open { display: block; }
   .qe-detail-section .qe-type-btn.sel { background: #7A1322; border-color: #7A1322; color: #FAF6EF; }
@@ -938,6 +945,7 @@ function initDOMTargets() {
   if (photoImg) photoImg.id = 'v3-photo';
 
   const headerBtns = document.querySelectorAll('header button');
+  if (headerBtns[0]) headerBtns[0].id = 'v3-back-btn';
   if (headerBtns[1]) headerBtns[1].id = 'v3-save-btn';
 
   const navBtns = document.querySelectorAll('#in-phone-nav button');
@@ -1492,6 +1500,25 @@ function enableSaveButton() {
   });
 }
 
+function enableHeaderBackButton() {
+  const backBtn = document.getElementById('v3-back-btn');
+  if (!backBtn || backBtn.dataset.backWired) return;
+  backBtn.dataset.backWired = '1';
+  backBtn.addEventListener('click', () => {
+    if (currentId === NEW_ENTRY_ID) {
+      const entry = collectCurrentEntry();
+      const hasDraft = [
+        entry.wineName, entry.vintage, entry.producer, entry.country, entry.region,
+        entry.grape, entry.wineType, entry.drinkDate, entry.price, entry.shop,
+        entry.tasteLook, entry.tasteAroma, entry.tasteFlavor, entry.tasteMemo,
+        entry.aiComment, entry.rawMemo, entry.photo,
+      ].some(value => String(value || '').trim()) || entry.rating > 0 || entry.isFav;
+      if (hasDraft && !confirm('入力途中の内容は保存されていません。一覧に戻ると破棄されます。戻りますか？')) return;
+    }
+    showList();
+  });
+}
+
 // ── Action Buttons ────────────────────────────────────────────────────────────
 function enableActionButtons() {
   const actionBtns = document.querySelectorAll('div[style*="grid-template-columns"] button');
@@ -1582,6 +1609,7 @@ function showList() {
       ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:40px 20px;">
            <div style="font-size:48px;">🍷</div>
            <div style="font-size:17px;color:#9A8C7C;text-align:center;">まだ記録がありません</div>
+           <button onclick="window.showQuickEntry()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:24px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">⚡ クイック入力</button>
            <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:24px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">最初のワインを記録する</button>
            <button onclick="window.showInbox()" style="background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:24px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 過去のメモから取り込む</button>
          </div>`
@@ -1616,6 +1644,7 @@ function showList() {
         <h1 style="font-family:'Playfair Display',serif;font-size:20px;color:#241015;font-weight:700;margin:0;">🍷 コレクション</h1>
         <div style="display:flex;gap:8px;align-items:center;">
           <button onclick="window.showInbox()" style="background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:20px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 取り込み</button>
+          <button aria-label="クイック入力" title="クイック入力" onclick="window.showQuickEntry()" style="background:transparent;border:1.5px solid #D4AF37;color:#5B0E1A;border-radius:20px;padding:7px 10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">⚡</button>
           <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;">+ 記録する</button>
         </div>
       </div>
@@ -1629,6 +1658,7 @@ function showList() {
   const itemsHTML = arr.length === 0
     ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;color:#9A8C7C;font-size:28px;gap:20px;">
          <div>まだ記録がありません</div>
+         <button onclick="window.showQuickEntry()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:18px 40px;font-size:26px;cursor:pointer;">⚡ クイック入力</button>
          <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:18px 40px;font-size:26px;cursor:pointer;">最初のワインを記録する</button>
          <button onclick="window.showInbox()" style="background:transparent;border:2px solid #5B0E1A;color:#5B0E1A;border-radius:40px;padding:14px 34px;font-size:22px;cursor:pointer;font-family:'Noto Serif JP',serif;">📥 過去のメモから取り込む</button>
        </div>`
@@ -1636,6 +1666,7 @@ function showList() {
          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
            <h2 style="font-family:'Playfair Display',serif;font-size:32px;color:#241015;">🍷 コレクション</h2>
            <div style="display:flex;gap:12px;align-items:center;">
+             <button aria-label="クイック入力" title="クイック入力" onclick="window.showQuickEntry()" style="background:transparent;border:2px solid #D4AF37;color:#5B0E1A;border-radius:40px;padding:10px 16px;font-size:20px;cursor:pointer;font-family:'Noto Serif JP',serif;">⚡</button>
              <button onclick="window.showInbox()" style="background:transparent;border:2px solid #5B0E1A;color:#5B0E1A;border-radius:40px;padding:10px 24px;font-size:20px;cursor:pointer;font-family:'Noto Serif JP',serif;">📥 取り込み</button>
              <button onclick="window.showNew()" style="background:#5B0E1A;color:#FAF6EF;border:none;border-radius:40px;padding:12px 28px;font-size:22px;cursor:pointer;">+ 記録する</button>
            </div>
@@ -1790,6 +1821,7 @@ function triggerAutoSave() {
 
 function reinitAll() {
   initDOMTargets();
+  enableHeaderBackButton();
   enableInlineEdit();
   enableChipEdit();
   enableDatePicker();
@@ -1922,7 +1954,7 @@ window.selectPickerItem = selectPickerItem;
 window.openVintagePicker = openVintagePicker;
 window.openCountryPickerDetail = openCountryPickerDetail;
 
-let qeRating = 4;
+let qeRating = 0;
 
 function renderQEStars(r) {
   const el = document.getElementById('qe-stars');
@@ -1938,22 +1970,30 @@ function renderQEStars(r) {
 window.renderQEStars = renderQEStars;
 
 function showQuickEntry() {
-  qeRating = 4;
-  renderQEStars(4);
+  qeRating = 0;
+  renderQEStars(0);
   const nameEl = document.getElementById('qe-name');
   const wantEl = document.getElementById('qe-want-again');
   const preview = document.getElementById('qe-photo-preview');
   const photoBtn = document.querySelector('.qe-photo-btn');
   const detailSection = document.getElementById('qe-detail-section');
-  const detailToggle = document.querySelector('.qe-detail-toggle');
+  const detailToggle = document.getElementById('qe-test-detail-toggle');
+  const extraSection = document.getElementById('qe-extra-section');
+  const extraToggle = document.getElementById('qe-extra-toggle');
   if (nameEl) nameEl.value = '';
-  ['qe-look','qe-aroma','qe-flavor'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['qe-look','qe-aroma','qe-flavor','qe-region','qe-producer','qe-grape','qe-price','qe-shop'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const drinkDateEl = document.getElementById('qe-drink-date');
+  const now = new Date();
+  const todayISO = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  if (drinkDateEl) drinkDateEl.value = todayISO;
   if (wantEl) wantEl.checked = true;
   if (preview) { preview.src = ''; preview.classList.remove('has-photo'); }
   if (photoBtn) photoBtn.textContent = '📷 写真を追加';
   if (detailSection) detailSection.classList.remove('open');
   if (detailToggle) detailToggle.textContent = '▶ もっと詳しく書く（試験対策）';
-  document.querySelectorAll('#qe-types .qe-type-btn').forEach((b, i) => b.classList.toggle('sel', i === 0));
+  if (extraSection) extraSection.classList.remove('open');
+  if (extraToggle) { extraToggle.textContent = '＋ 生産者・品種・購入情報を追加'; extraToggle.setAttribute('aria-expanded', 'false'); }
+  document.querySelectorAll('#qe-types .qe-type-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('#qe-countries .qe-type-btn').forEach(b => b.classList.remove('sel'));
   document.querySelectorAll('#qe-detail-section .qe-type-btn').forEach(b => b.classList.remove('sel'));
   const vintageInp = document.getElementById('qe-vintage');
@@ -1963,36 +2003,69 @@ function showQuickEntry() {
   const regionEl = document.getElementById('qe-region');
   if (regionEl) regionEl.value = '';
   const modal = document.getElementById('quick-modal');
-  if (modal) delete modal.dataset.currentId;
+  if (modal) {
+    delete modal.dataset.currentId;
+    modal.dataset.defaultDate = todayISO;
+  }
   modal.classList.add('open');
-  setTimeout(() => { if (memoEl) memoEl.focus(); }, 150);
+  setTimeout(() => { if (nameEl) nameEl.focus(); }, 150);
 }
 window.showQuickEntry = showQuickEntry;
 
-async function closeQuickEntry() {
+function quickEntryHasContent() {
+  const textIds = ['qe-name','qe-vintage','qe-region','qe-producer','qe-grape','qe-price','qe-shop','qe-look','qe-aroma','qe-flavor'];
+  if (textIds.some(id => {
+    const el = document.getElementById(id);
+    return el && String(el.value || '').trim();
+  })) return true;
+  const modal = document.getElementById('quick-modal');
+  const drinkDate = document.getElementById('qe-drink-date');
+  if (drinkDate && modal && drinkDate.value !== modal.dataset.defaultDate) return true;
+  const photo = document.getElementById('qe-photo-preview');
+  if (photo && photo.classList.contains('has-photo')) return true;
+  if (document.querySelector('#qe-countries .qe-type-btn.sel, #qe-types .qe-type-btn.sel, #qe-detail-section .qe-type-btn.sel')) return true;
+  const wantAgain = document.getElementById('qe-want-again');
+  return qeRating > 0 || !!(wantAgain && !wantAgain.checked);
+}
+
+function finishQuickEntrySave(entry) {
+  const modal = document.getElementById('quick-modal');
+  if (modal) modal.classList.remove('open');
+  showEntry(entry.id);
+  showToast('✓ 保存しました');
+  try {
+    const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
+    _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-quick' });
+    localStorage.setItem('star_chart_events', JSON.stringify(_sc));
+  } catch (_e) {}
+  sbUpsertEntry(entry);
+}
+
+function closeQuickEntry() {
   const m = document.getElementById('quick-modal');
-  if (!m) return;
-  const nameEl = document.getElementById('qe-name');
-  const name = (nameEl ? nameEl.value : '').trim();
-  const hasMemo = ['qe-look','qe-aroma','qe-flavor'].some(id => { const el = document.getElementById(id); return el && el.value.trim(); });
-  if (name || hasMemo || m.dataset.currentId) {
-    const entry = await qeDoSave();
-    m.classList.remove('open');
-    if (entry) {
-      showEntry(entry.id);
-      showToast('✓ 保存しました');
-      try {
-        const _sc = JSON.parse(localStorage.getItem('star_chart_events') || '[]');
-        _sc.push({ ts: new Date().toISOString(), routine_id: 'R017', credit: 1.0, source: 'wine-note-quick' });
-        localStorage.setItem('star_chart_events', JSON.stringify(_sc));
-      } catch (_e) {}
-      sbUpsertEntry(entry);
-    }
-  } else {
-    m.classList.remove('open');
-  }
+  if (!m) return true;
+  if (quickEntryHasContent() && !confirm('入力内容はまだ保存されていません。破棄して閉じますか？')) return false;
+  m.classList.remove('open');
+  return true;
 }
 window.closeQuickEntry = closeQuickEntry;
+
+function closeQuickEntryThenInbox() {
+  if (closeQuickEntry()) showInbox();
+}
+window.closeQuickEntryThenInbox = closeQuickEntryThenInbox;
+
+async function saveQuickEntry() {
+  if (!quickEntryHasContent()) {
+    showToast('ワイン名、写真、メモなどを入力してください');
+    const nameEl = document.getElementById('qe-name');
+    if (nameEl) nameEl.focus();
+    return;
+  }
+  const entry = await qeDoSave();
+  if (entry) finishQuickEntrySave(entry);
+}
+window.saveQuickEntry = saveQuickEntry;
 
 async function qeDoSave() {
   const nameEl = document.getElementById('qe-name');
@@ -2001,6 +2074,10 @@ async function qeDoSave() {
   const modal = document.getElementById('quick-modal');
 
   const name = (nameEl ? nameEl.value : '').trim();
+  const producer = (document.getElementById('qe-producer') || {value:''}).value.trim();
+  const grape = (document.getElementById('qe-grape') || {value:''}).value.trim();
+  const price = (document.getElementById('qe-price') || {value:''}).value.trim();
+  const shop = (document.getElementById('qe-shop') || {value:''}).value.trim();
   const look   = (document.getElementById('qe-look')   || {value:''}).value.trim();
   const aroma  = (document.getElementById('qe-aroma')  || {value:''}).value.trim();
   const flavor = (document.getElementById('qe-flavor') || {value:''}).value.trim();
@@ -2009,11 +2086,13 @@ async function qeDoSave() {
 
   const now = new Date();
   const days = ['日','月','火','水','木','金','土'];
-  const autoName = name || `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} のワイン`;
-  const drinkDate = `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
+  const selectedDate = (document.getElementById('qe-drink-date') || {value:''}).value;
+  const parsedDate = selectedDate ? new Date(selectedDate + 'T00:00:00') : now;
+  const autoName = name || `${parsedDate.getFullYear()}/${String(parsedDate.getMonth()+1).padStart(2,'0')}/${String(parsedDate.getDate()).padStart(2,'0')} のワイン`;
+  const drinkDate = `${parsedDate.getFullYear()} / ${String(parsedDate.getMonth()+1).padStart(2,'0')} / ${String(parsedDate.getDate()).padStart(2,'0')} (${days[parsedDate.getDay()]})`;
 
   const selType = document.querySelector('#qe-types .qe-type-btn.sel');
-  const wineType = selType ? selType.dataset.type : '赤ワイン';
+  const wineType = selType ? selType.dataset.type : '';
 
   const selCountry = document.querySelector('#qe-countries .qe-type-btn.sel');
   const country = selCountry ? selCountry.dataset.country : '';
@@ -2035,7 +2114,7 @@ async function qeDoSave() {
   if (existingId) {
     const idx = arr.findIndex(e => e.id === existingId);
     if (idx >= 0) {
-      entry = { ...arr[idx], wineName: autoName, wineType, tasteLook: look || arr[idx].tasteLook || '', tasteAroma: aroma || arr[idx].tasteAroma || '', tasteFlavor: flavor || arr[idx].tasteFlavor || '', tasteMemo: detailText || arr[idx].tasteMemo || '', rating: qeRating, wantAgain, photo: photo || arr[idx].photo || '', country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '', region: region || arr[idx].region || '' };
+      entry = { ...arr[idx], wineName: autoName, producer: producer || arr[idx].producer || '', grape: grape || arr[idx].grape || '', wineType, tasteLook: look || arr[idx].tasteLook || '', tasteAroma: aroma || arr[idx].tasteAroma || '', tasteFlavor: flavor || arr[idx].tasteFlavor || '', tasteMemo: detailText || arr[idx].tasteMemo || '', rating: qeRating, wantAgain, photo: photo || arr[idx].photo || '', country: country || arr[idx].country || '', vintage: vintage || arr[idx].vintage || '', region: region || arr[idx].region || '', drinkDate, price: price || arr[idx].price || '', shop: shop || arr[idx].shop || '' };
       arr[idx] = entry;
     }
   }
@@ -2044,8 +2123,8 @@ async function qeDoSave() {
     entry = {
       id: Date.now().toString(),
       createdAt: Date.now(),
-      wineName: autoName, vintage, producer: '', country, region, grape: '',
-      wineType, drinkDate, price: '', shop: '',
+      wineName: autoName, vintage, producer, country, region, grape,
+      wineType, drinkDate, price, shop,
       tasteLook: look, tasteAroma: aroma, tasteFlavor: flavor, tasteMemo: detailText,
       rating: qeRating, wantAgain, isFav: false, photo, aiComment: '', rawMemo: '',
     };
@@ -2068,11 +2147,6 @@ async function qeDoSave() {
 }
 window.qeDoSave = qeDoSave;
 
-function saveQuickEntry() {
-  closeQuickEntry();
-}
-window.saveQuickEntry = saveQuickEntry;
-
 function qeHandlePhoto(inp) {
   const file = inp.files[0];
   if (!file) return;
@@ -2087,12 +2161,24 @@ window.qeHandlePhoto = qeHandlePhoto;
 
 function toggleQEDetail() {
   const section = document.getElementById('qe-detail-section');
-  const btn = document.querySelector('.qe-detail-toggle');
+  const btn = document.getElementById('qe-test-detail-toggle');
   if (!section) return;
   const isOpen = section.classList.toggle('open');
   if (btn) btn.textContent = isOpen ? '▲ 折りたたむ（試験対策）' : '▶ もっと詳しく書く（試験対策）';
 }
 window.toggleQEDetail = toggleQEDetail;
+
+function toggleQEExtra() {
+  const section = document.getElementById('qe-extra-section');
+  const btn = document.getElementById('qe-extra-toggle');
+  if (!section) return;
+  const isOpen = section.classList.toggle('open');
+  if (btn) {
+    btn.textContent = isOpen ? '− 生産者・品種・購入情報を閉じる' : '＋ 生産者・品種・購入情報を追加';
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+}
+window.toggleQEExtra = toggleQEExtra;
 
 // ══════════════════════════════════════════════════════
 // ① 試験対策テイスティングモード
@@ -2169,7 +2255,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Quick Entry stars
   const qeStarsEl = document.getElementById('qe-stars');
   if (qeStarsEl) {
-    renderQEStars(4);
+    renderQEStars(0);
     qeStarsEl.addEventListener('click', (e) => {
       const rect = qeStarsEl.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -2553,7 +2639,7 @@ function buildInboxPrompt(memo) {
     'お願い:',
     '1. テイスティング表現を二次試験の観点（外観・香り・味わい・余韻）で優しく添削し、10点満点で評価してください。',
     '2. 回答の最後に、次のキーを持つJSONを ```json コードブロックで出力してください:',
-    'wine_name, vintage, producer, country, grape, wine_type（"赤ワイン"/"白ワイン"/"ロゼ"/"スパークリング"/"甘口"のいずれか）, drink_date（"YYYY / MM / DD" 形式・不明なら空文字）, price, shop, taste_look, taste_aroma, taste_flavor, taste_memo, rating（0〜5の0.5刻み・読み取れなければ4）, ai_comment（添削の要約を2〜3文・優しい口調で）',
+    'wine_name, vintage, producer, country, grape, wine_type（"赤ワイン"/"白ワイン"/"ロゼ"/"スパークリング"/"甘口"のいずれか）, drink_date（"YYYY / MM / DD" 形式・不明なら空文字）, price, shop, taste_look, taste_aroma, taste_flavor, taste_memo, rating（0〜5の0.5刻み・読み取れなければ0＝未評価）, ai_comment（添削の要約を2〜3文・優しい口調で）',
     '※メモに書かれていない情報は創作せず、空文字にしてください。'
   ].join('\n');
 }
@@ -2753,7 +2839,7 @@ function importInbox() {
     tasteAroma:  p.tasteAroma || '',
     tasteFlavor: p.tasteFlavor || '',
     tasteMemo:   p.tasteMemo || '',
-    rating:      (p.rating != null ? p.rating : 4),
+    rating:      (p.rating != null ? p.rating : 0),
     wantAgain:   'はい',
     isFav:       false,
     photo:       '',
@@ -2818,6 +2904,19 @@ window.importInbox = importInbox;
       </div>
       <div class="qe-label">地域 <span style="font-weight:400;color:#C4B5A5;font-size:11px;">（任意・例: ブルゴーニュ）</span></div>
       <input id="qe-region" class="qe-input" type="text" placeholder="例: ブルゴーニュ、カリフォルニア" autocomplete="off" style="margin-bottom:14px;">
+      <div class="qe-label">飲んだ日</div>
+      <input id="qe-drink-date" class="qe-input" type="date" style="margin-bottom:14px;">
+      <button id="qe-extra-toggle" class="qe-detail-toggle" style="margin-bottom:8px;" aria-expanded="false" onclick="window.toggleQEExtra()">＋ 生産者・品種・購入情報を追加</button>
+      <div id="qe-extra-section" class="qe-extra-section">
+        <div class="qe-label">生産者</div>
+        <input id="qe-producer" class="qe-input" type="text" placeholder="例: シャトー・マルゴー" autocomplete="off">
+        <div class="qe-label">ぶどう品種</div>
+        <input id="qe-grape" class="qe-input" type="text" placeholder="例: カベルネ・ソーヴィニヨン" autocomplete="off">
+        <div class="qe-label">購入価格</div>
+        <input id="qe-price" class="qe-input" type="text" inputmode="decimal" placeholder="例: 4500円" autocomplete="off">
+        <div class="qe-label">購入場所</div>
+        <input id="qe-shop" class="qe-input" type="text" placeholder="例: ワインショップ名" autocomplete="off" style="margin-bottom:0;">
+      </div>
       <!-- ② 写真 -->
       <div class="qe-label">写真</div>
       <div class="qe-photo-area">
@@ -2846,7 +2945,7 @@ window.importInbox = importInbox;
       <div style="font-size:12px;color:#9A8C7C;margin-bottom:5px;">✨ 味わい</div>
       <textarea id="qe-flavor" class="qe-memo" style="height:64px;margin-bottom:4px;" placeholder="酸味、甘み、渋み、余韻…"></textarea>
       <!-- ⑥ 試験対策チップ（折りたたみ） -->
-      <button class="qe-detail-toggle" onclick="window.toggleQEDetail()">▶ もっと詳しく書く（試験対策）</button>
+      <button id="qe-test-detail-toggle" class="qe-detail-toggle" onclick="window.toggleQEDetail()">▶ もっと詳しく書く（試験対策）</button>
       <div id="qe-detail-section" class="qe-detail-section">
         <div class="qe-label" style="color:#A9842A;margin-top:2px;">色・外観</div>
         <div class="qe-type-row" style="flex-wrap:wrap;">
@@ -2895,8 +2994,9 @@ window.importInbox = importInbox;
         </label>
       </div>
       <!-- 📥 メモから取り込む -->
-      <button onclick="window.closeQuickEntry();window.showInbox();" style="width:100%;margin-top:6px;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 メモから取り込む</button>
+      <button onclick="window.closeQuickEntryThenInbox();" style="width:100%;margin-top:6px;background:transparent;border:1.5px solid #5B0E1A;color:#5B0E1A;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent;">📥 メモから取り込む</button>
     </div>
+    <div class="ws-footer"><button id="qe-save-btn" class="qe-save" onclick="window.saveQuickEntry()">記録を保存する</button></div>
   </div>
 </div>
 
