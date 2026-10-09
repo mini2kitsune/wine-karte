@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wine-notes-v17-input-ux';
+const CACHE_NAME = 'wine-notes-v18-collection-header';
 const STATIC_ASSETS = [
   '/wine-karte/',
   '/wine-karte/index.html',
